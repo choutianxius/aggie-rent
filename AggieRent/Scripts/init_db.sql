@@ -1,0 +1,8 @@
+DROP TABLE IF EXISTS "user";
+
+CREATE TABLE IF NOT EXISTS "user"
+(
+    user_id VARCHAR(255) PRIMARY KEY,
+    email VARCHAR(255),
+    hashed_password VARCHAR(255) UNIQUE NOT NULL
+);
