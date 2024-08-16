@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AggieRent", "AggieRent\AggieRent.csproj", "{560800F8-561E-449A-89CE-B57CB0B2F567}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AggieRent.Tests", "AggieRent.Tests\AggieRent.Tests.csproj", "{6300D8CD-31B6-4AA4-8F77-084240B8A36B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{560800F8-561E-449A-89CE-B57CB0B2F567}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{560800F8-561E-449A-89CE-B57CB0B2F567}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{560800F8-561E-449A-89CE-B57CB0B2F567}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{560800F8-561E-449A-89CE-B57CB0B2F567}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6300D8CD-31B6-4AA4-8F77-084240B8A36B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6300D8CD-31B6-4AA4-8F77-084240B8A36B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6300D8CD-31B6-4AA4-8F77-084240B8A36B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6300D8CD-31B6-4AA4-8F77-084240B8A36B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
