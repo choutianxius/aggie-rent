@@ -8,8 +8,11 @@ namespace AggieRent.Tests.Services
 {
     public class UserService_RegisterShould
     {
-        [Fact]
-        public void Register_GoodInput_ThenOk()
+        [Theory]
+        [InlineData("aggie@tamu.edu", "VerysecretP@ssw0rd")]
+        [InlineData("Aggie@tamu.edu", "VerysecretP@ssw0rd")]
+        [InlineData("aggie@TAMU.edu", "VerysecretP@ssw0rd")]
+        public void Register_GoodInput_ThenOk(string email, string password)
         {
             // Arrange
             var mockUserRepository = new Mock<IUserRepository>();
@@ -21,14 +24,12 @@ namespace AggieRent.Tests.Services
             var userService = new UserService(mockUserRepository.Object);
 
             // Act
-            string testEmail = "aggie@tamu.edu";
-            string testPassword = "123456";
-            userService.Register(testEmail, testPassword);
+            userService.Register(email, password);
 
             // Assert
             Assert.Single(users);
-            Assert.Equal(testEmail, users[0].Email);
-            Assert.True(BC.Verify(testPassword, users[0].HashedPassword));
+            Assert.Equal(email.ToLower(), users[0].Email);
+            Assert.True(BC.Verify(password, users[0].HashedPassword));
         }
 
         [Theory]
@@ -44,7 +45,7 @@ namespace AggieRent.Tests.Services
                 new()
                 {
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("123456"),
+                    HashedPassword = BC.HashPassword("VerysecretP@ssw0rd"),
                     UserId = Guid.NewGuid().ToString()
                 }
             ];
@@ -52,7 +53,7 @@ namespace AggieRent.Tests.Services
             var userService = new UserService(mockUserRepository.Object);
 
             // Act
-            void action() => userService.Register(email, "123456");
+            void action() => userService.Register(email, "VerysecretP@ssw0rd");
 
             // Assert
             Assert.Throws<ArgumentException>(action);
