@@ -1,4 +1,5 @@
-﻿using AggieRent.DataAccess;
+﻿using AggieRent.Common;
+using AggieRent.DataAccess;
 using AggieRent.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
@@ -16,7 +17,7 @@ builder
     .AddCookie(options =>
     {
         options.ExpireTimeSpan = TimeSpan.FromMinutes(
-            builder.Configuration.GetValue<int>("Cookie:ExpireTimeSpan")
+            builder.Configuration.GetValue<int>("CookieSettings:ExpireTimeSpan")
         );
         options.SlidingExpiration = true;
         options.Events.OnRedirectToLogin = context =>
@@ -45,10 +46,18 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
-
-app.UseAuthorization();
-
-app.MapControllers();
+if (
+    Environment.GetEnvironmentVariable("AUTH_DISABLED") != null
+    && Environment.GetEnvironmentVariable("AUTH_DISABLED")!.Equals("true")
+)
+{
+    app.MapControllers().AllowAnonymous();
+}
+else
+{
+    app.UseAuthentication();
+    app.UseAuthorization();
+    app.MapControllers();
+}
 
 app.Run();
