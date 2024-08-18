@@ -64,5 +64,13 @@ namespace AggieRent.Controllers
                 return BadRequest(new ErrorResponseDTO(ae.Message));
             }
         }
+
+        [Route("/api/logout")]
+        [HttpPost]
+        public async Task<IActionResult> Logout()
+        {
+            await HttpContext.SignOutAsync();
+            return Ok();
+        }
     }
 }

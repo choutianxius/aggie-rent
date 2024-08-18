@@ -143,4 +143,39 @@ namespace AggieRent.Tests.Controllers
             Assert.Equivalent(new ErrorResponseDTO(testErrorMessage), castResponse.Value);
         }
     }
+
+    public class AuthController_LogoutShould
+    {
+        [Fact]
+        public async void Logout_Then200Ok()
+        {
+            var mockUserService = new Mock<IUserService>();
+            // Arrange authentication service, which is implicitly required by the SignInAsync method
+            var mockHttpContext = new Mock<HttpContext>();
+            var mockAuthenticationService = new Mock<IAuthenticationService>();
+            var mockSchemeProvider = new Mock<IAuthenticationSchemeProvider>();
+            mockAuthenticationService
+                .Setup(x =>
+                    x.SignInAsync(
+                        It.IsAny<HttpContext>(),
+                        It.IsAny<string>(),
+                        It.IsAny<ClaimsPrincipal>(),
+                        It.IsAny<AuthenticationProperties>()
+                    )
+                )
+                .Returns(Task.CompletedTask);
+            mockHttpContext
+                .Setup(x => x.RequestServices.GetService(typeof(IAuthenticationService)))
+                .Returns(mockAuthenticationService.Object);
+
+            var authController = new AuthController(mockUserService.Object)
+            {
+                ControllerContext = new ControllerContext() { HttpContext = mockHttpContext.Object }
+            };
+
+            var response = await authController.Logout();
+
+            Assert.IsType<OkResult>(response);
+        }
+    }
 }
