@@ -17,10 +17,17 @@ namespace AggieRent.Controllers
         }
 
         [HttpPost]
-        public IActionResult Register([FromBody] UserAuthDTO userAuthDto)
+        public IActionResult Register([FromBody] UserRegisterDTO userRegisterDto)
         {
-            _userService.Register(userAuthDto.Email, userAuthDto.Password);
-            return Ok();
+            try
+            {
+                _userService.Register(userRegisterDto.Email, userRegisterDto.Password);
+                return Ok();
+            }
+            catch (ArgumentException ae)
+            {
+                return BadRequest(new ErrorResponseBody(ae.Message));
+            }
         }
     }
 }
