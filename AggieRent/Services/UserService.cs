@@ -1,3 +1,4 @@
+using System.Net.Mail;
 using System.Text.RegularExpressions;
 using AggieRent.DataAccess;
 using AggieRent.Models;
@@ -7,12 +8,11 @@ namespace AggieRent.Services
     public partial class UserService(IUserRepository userRepository) : IUserService
     {
         private readonly IUserRepository _userRepository = userRepository;
-        private readonly Regex emailRegex = EmailRegex();
 
         public void Register(string email, string password)
         {
             string normalizedEmail = email.ToLower();
-            if (!emailRegex.IsMatch(normalizedEmail))
+            if (!ValidateEmail(normalizedEmail))
                 throw new ArgumentException("Invalid email format!");
 
             // Lazy execute
@@ -21,6 +21,12 @@ namespace AggieRent.Services
                 .FirstOrDefault(u => u.Email == normalizedEmail);
             if (existingUser != null)
                 throw new ArgumentException("Email already in use!");
+
+            if (!ValidatePassword(password))
+                throw new ArgumentException(
+                    "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number"
+                );
+
             User user =
                 new()
                 {
@@ -38,9 +44,27 @@ namespace AggieRent.Services
             return _userRepository.GetAll().ToList();
         }
 
-        [GeneratedRegex(
-            "(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|\"(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21\\x23-\\x5b\\x5d-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])*\")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\\[(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?|[a-z0-9-]*[a-z0-9]:(?:[\\x01-\\x08\\x0b\\x0c\\x0e-\\x1f\\x21-\\x5a\\x53-\\x7f]|\\\\[\\x01-\\x09\\x0b\\x0c\\x0e-\\x7f])+)\\])"
-        )]
-        private static partial Regex EmailRegex();
+        private static bool ValidateEmail(string email)
+        {
+            try
+            {
+                var mailAddress = new MailAddress(email);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        [GeneratedRegex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$")]
+        private static partial Regex PasswordRegex();
+
+        private static readonly Regex passwordRegex = PasswordRegex();
+
+        private static bool ValidatePassword(string password)
+        {
+            return passwordRegex.IsMatch(password);
+        }
     }
 }
