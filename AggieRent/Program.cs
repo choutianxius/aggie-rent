@@ -1,15 +1,22 @@
 ﻿using AggieRent.DataAccess;
+using AggieRent.Models;
 using AggieRent.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("default"))
+var dataSourceBuilder = new NpgsqlDataSourceBuilder(
+    builder.Configuration.GetConnectionString("default")
 );
+
+// Specify all persisted enums here
+dataSourceBuilder.MapEnum<UserRole>();
+var dataSource = dataSourceBuilder.Build();
+builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(dataSource));
 
 builder
     .Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
