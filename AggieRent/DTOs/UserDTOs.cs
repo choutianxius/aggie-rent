@@ -5,12 +5,14 @@ namespace AggieRent.DTOs
     public class UserSummaryDTO
     {
         public string Email { get; set; } = "";
+        public UserRole Role { get; set; }
 
         public UserSummaryDTO() { }
 
         public UserSummaryDTO(User user)
         {
             Email = user.Email;
+            Role = user.Role;
         }
     }
 

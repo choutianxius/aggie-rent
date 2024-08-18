@@ -14,7 +14,8 @@ namespace AggieRent.Tests.DTOs
             {
                 Email = "aggie@tamu.edu",
                 HashedPassword = BC.HashPassword("123456"),
-                UserId = Guid.NewGuid().ToString()
+                UserId = Guid.NewGuid().ToString(),
+                Role = UserRole.User
             };
 
             // Act
@@ -22,6 +23,7 @@ namespace AggieRent.Tests.DTOs
 
             // Assert
             Assert.Equal(user.Email, userSummaryDTO.Email);
+            Assert.Equal(user.Role, userSummaryDTO.Role);
         }
     }
 }

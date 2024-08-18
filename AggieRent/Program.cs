@@ -1,4 +1,6 @@
-﻿using AggieRent.DataAccess;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using AggieRent.DataAccess;
 using AggieRent.Models;
 using AggieRent.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -7,7 +9,14 @@ using Npgsql;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder
+    .Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(
+            new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)
+        );
+    });
 
 var dataSourceBuilder = new NpgsqlDataSourceBuilder(
     builder.Configuration.GetConnectionString("default")
