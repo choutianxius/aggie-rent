@@ -7,5 +7,6 @@ namespace AggieRent.DataAccess
         : DbContext(options)
     {
         public required DbSet<User> Users { get; set; }
+        public required DbSet<Apartment> Apartments { get; set; }
     }
 }
