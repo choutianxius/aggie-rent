@@ -1,5 +1,4 @@
-﻿using AggieRent.Common;
-using AggieRent.DataAccess;
+﻿using AggieRent.DataAccess;
 using AggieRent.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;

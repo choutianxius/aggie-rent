@@ -38,11 +38,9 @@ namespace AggieRent.Controllers
                 var user = _userService.Login(userLoginDto.Email, userLoginDto.Password);
 
                 // cookie-based authentication
-                string claimedRole;
-                if (user.Role.Equals(UserRole.Admin))
-                    claimedRole = ApplicationConstants.UserRoleClaim.Admin;
-                else
-                    claimedRole = ApplicationConstants.UserRoleClaim.User;
+                string claimedRole = user.Role.Equals(UserRole.Admin)
+                    ? ApplicationConstants.UserRoleClaim.Admin
+                    : ApplicationConstants.UserRoleClaim.User;
                 var claims = new List<Claim>()
                 {
                     new(ClaimTypes.Name, user.Email),
