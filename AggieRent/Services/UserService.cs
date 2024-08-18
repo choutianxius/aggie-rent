@@ -11,7 +11,7 @@ namespace AggieRent.Services
 
         public void Register(string email, string password)
         {
-            string normalizedEmail = email.ToLower();
+            string normalizedEmail = NormalizeEmail(email);
             if (!ValidateEmail(normalizedEmail))
                 throw new ArgumentException("Invalid email format!");
 
@@ -37,11 +37,24 @@ namespace AggieRent.Services
             _userRepository.Add(user);
         }
 
-        public void Login(string email, string password) { }
+        public User Login(string email, string password)
+        {
+            var user =
+                _userRepository.GetAll().FirstOrDefault(u => u.Email.Equals(NormalizeEmail(email)))
+                ?? throw new ArgumentException("Email not registered!");
+            if (!BC.Verify(password, user.HashedPassword))
+                throw new ArgumentException("Wrong password!");
+            return user;
+        }
 
         public IEnumerable<User> GetUsers()
         {
             return _userRepository.GetAll().ToList();
+        }
+
+        private static string NormalizeEmail(string email)
+        {
+            return email.ToLower();
         }
 
         private static bool ValidateEmail(string email)
@@ -62,6 +75,9 @@ namespace AggieRent.Services
 
         private static readonly Regex passwordRegex = PasswordRegex();
 
+        /// <summary>
+        /// Verify the format of a password during registration
+        /// </summary>
         private static bool ValidatePassword(string password)
         {
             return passwordRegex.IsMatch(password);

@@ -113,4 +113,70 @@ namespace AggieRent.Tests.Services
             );
         }
     }
+
+    public class UserService_LoginShould
+    {
+        [Fact]
+        public void Login_ValidCredentials_ThenReturnUser()
+        {
+            var mockUserRepository = new Mock<IUserRepository>();
+            var testEmail = "aggie@tamu.edu";
+            var testPassword = "veryStrongP@ssw0rd";
+            List<User> users =
+            [
+                new()
+                {
+                    Email = testEmail,
+                    HashedPassword = BC.HashPassword(testPassword),
+                    UserId = Guid.NewGuid().ToString()
+                }
+            ];
+            mockUserRepository.Setup(x => x.GetAll()).Returns(users.AsQueryable());
+            var userService = new UserService(mockUserRepository.Object);
+
+            var user = userService.Login(testEmail, testPassword);
+
+            Assert.Equivalent(users[0], user);
+        }
+
+        [Fact]
+        public void Login_UnknownEmail_ThenArgumentException()
+        {
+            var mockUserRepository = new Mock<IUserRepository>();
+            var testEmail = "aggie@tamu.edu";
+            var testPassword = "veryStrongP@ssw0rd";
+            List<User> users = [];
+            mockUserRepository.Setup(x => x.GetAll()).Returns(users.AsQueryable());
+            var userService = new UserService(mockUserRepository.Object);
+
+            void action() => userService.Login(testEmail, testPassword);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Email not registered!", ae.Message);
+        }
+
+        [Fact]
+        public void Login_WrongPassword_ThenArgumentException()
+        {
+            var mockUserRepository = new Mock<IUserRepository>();
+            var testEmail = "aggie@tamu.edu";
+            var testPassword = "veryStrongP@ssw0rd";
+            List<User> users =
+            [
+                new()
+                {
+                    Email = testEmail,
+                    HashedPassword = BC.HashPassword(testPassword),
+                    UserId = Guid.NewGuid().ToString()
+                }
+            ];
+            mockUserRepository.Setup(x => x.GetAll()).Returns(users.AsQueryable());
+            var userService = new UserService(mockUserRepository.Object);
+
+            void action() => userService.Login(testEmail, "someR@nd0mp@ssw0rd");
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Wrong password!", ae.Message);
+        }
+    }
 }

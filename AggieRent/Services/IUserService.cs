@@ -6,7 +6,7 @@ namespace AggieRent.Services
     {
         void Register(string email, string password);
 
-        void Login(string email, string password);
+        User Login(string email, string password);
 
         IEnumerable<User> GetUsers();
     }
