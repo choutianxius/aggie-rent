@@ -18,5 +18,13 @@ namespace AggieRent.DTOs
     {
         public required string Email { get; set; }
         public required string Password { get; set; }
+
+        // Any other fields can be added below in the future
+    }
+
+    public class UserLoginDTO
+    {
+        public required string Email { get; set; }
+        public required string Password { get; set; }
     }
 }

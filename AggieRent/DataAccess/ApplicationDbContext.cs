@@ -11,6 +11,10 @@ namespace AggieRent.DataAccess
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<User>().HasIndex(u => u.Email).IsUnique();
+            modelBuilder
+                .Entity<User>()
+                .Property(e => e.Role)
+                .HasConversion(v => v.ToString(), v => Enum.Parse<UserRole>(v));
         }
     }
 }
