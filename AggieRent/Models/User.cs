@@ -15,5 +15,14 @@ namespace AggieRent.Models
 
         [Column("hashed_password")]
         public required string HashedPassword { get; set; }
+
+        [Column("role")]
+        public UserRole Role { get; set; }
+    }
+
+    public enum UserRole
+    {
+        User,
+        Admin
     }
 }

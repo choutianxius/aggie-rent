@@ -4,9 +4,17 @@ A .NET Core project helping Aggies find their dream home!
 
 ## Quick Start
 
-```shell
-dotnet run --project AggieRent
-```
+- With authentication and authorization:
+
+  ```shell
+  dotnet run --project AggieRent
+  ```
+
+- With auth disabled:
+
+  ```shell
+  dotnet run --project AggieRent -lp no-auth
+  ```
 
 ## Unit Testing
 
