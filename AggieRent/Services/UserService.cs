@@ -40,7 +40,7 @@ namespace AggieRent.Services
         public User Login(string email, string password)
         {
             var user =
-                _userRepository.GetAll().FirstOrDefault(u => u.Email.Equals(NormalizeEmail(email)))
+                _userRepository.GetAll().FirstOrDefault(u => u.Email!.Equals(NormalizeEmail(email)))
                 ?? throw new ArgumentException("Email not registered!");
             if (!BC.Verify(password, user.HashedPassword))
                 throw new ArgumentException("Wrong password!");
@@ -50,6 +50,29 @@ namespace AggieRent.Services
         public IEnumerable<User> GetUsers()
         {
             return _userRepository.GetAll().ToList();
+        }
+
+        public User GetUserById(string userId)
+        {
+            return _userRepository.Get(userId) ?? throw new ArgumentException("User not found");
+        }
+
+        public void UpdateUser(User user)
+        {
+            var existingUser =
+                _userRepository.Get(user.UserId) ?? throw new ArgumentException("User not found");
+            // update members that are not UserId, Email or HashedPassword
+            // UserId and Email are immutable
+            // update password should be an individual method
+            existingUser.Role = user.Role;
+            _userRepository.Update(existingUser);
+        }
+
+        public void DeleteUser(string userId)
+        {
+            var existingUser =
+                _userRepository.Get(userId) ?? throw new ArgumentException("User not found");
+            _userRepository.Delete(existingUser);
         }
 
         private static string NormalizeEmail(string email)

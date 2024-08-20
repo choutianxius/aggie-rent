@@ -11,10 +11,10 @@ namespace AggieRent.Models
         public required string UserId { get; set; }
 
         [Column("email")]
-        public required string Email { get; set; }
+        public string? Email { get; set; }
 
         [Column("hashed_password")]
-        public required string HashedPassword { get; set; }
+        public string? HashedPassword { get; set; }
 
         [Column("role")]
         public UserRole Role { get; set; }
