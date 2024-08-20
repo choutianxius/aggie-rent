@@ -35,7 +35,7 @@ namespace AggieRent.Models
         public required string AddressLine2 { get; set; }
 
         [Column("desc")]
-        public required string Description { get; set; }
+        public string Description { get; set; } = "";
 
         [Column("available_date")]
         public required DateTime AvaiableDate { get; set; }
