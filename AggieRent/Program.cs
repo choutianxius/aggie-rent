@@ -72,6 +72,13 @@ else
 {
     app.UseAuthentication();
     app.UseAuthorization();
+    app.UseCookiePolicy(
+        new()
+        {
+            Secure = CookieSecurePolicy.SameAsRequest,
+            HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always
+        }
+    );
     app.MapControllers();
 }
 
