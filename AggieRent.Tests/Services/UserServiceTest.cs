@@ -179,4 +179,87 @@ namespace AggieRent.Tests.Services
             Assert.Equal("Wrong password!", ae.Message);
         }
     }
+
+    public class UserService_GetUsersShould
+    {
+        [Fact]
+        public void GetUsers_ThenReturnAllUsers()
+        {
+            var mockUserRepository = new Mock<IUserRepository>();
+            List<User> users =
+            [
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "admin@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    Role = UserRole.Admin
+                },
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("awesomeStr0ngP@ssw0rd"),
+                    Role = UserRole.User
+                }
+            ];
+            mockUserRepository.Setup(x => x.GetAll()).Returns(users.AsQueryable());
+            var userService = new UserService(mockUserRepository.Object);
+
+            var returnedUsers = userService.GetUsers();
+
+            Assert.Equivalent(users, returnedUsers);
+        }
+    }
+
+    public class UserService_GetUserByIdShould
+    {
+        [Fact]
+        public void GetUserById_GoodId_ThenReturnUser()
+        {
+            throw new Exception("TODO: Test not implemented yet!");
+        }
+
+        [Fact]
+        public void GetUserById_UnknownId_ThenArgumentException()
+        {
+            throw new Exception("TODO: Test not implemented yet!");
+        }
+    }
+
+    public class UserService_UpdateUserShould
+    {
+        [Fact]
+        public void UpdateUser_ThenUpdateNotNullMutableAttributes()
+        {
+            throw new Exception("TODO: Test not implemented yet!");
+        }
+
+        [Fact]
+        public void UpdateUser_TryUpdateImmutableAttributes_ThenNotUpdated()
+        {
+            throw new Exception("TODO: Test not implemented yet!");
+        }
+
+        [Fact]
+        public void UpdateUser_UnknownUser_ThenArgumentException()
+        {
+            throw new Exception("TODO: Test not implemented yet!");
+        }
+    }
+
+    public class UserService_DeleteUserShould
+    {
+        [Fact]
+        public void DeleteUser_UserFound_ThenDeleted()
+        {
+            throw new Exception("TODO: Test not implemented yet!");
+        }
+
+        [Fact]
+        public void DeleteUser_UserNotFound_ThenArgumentException()
+        {
+            throw new Exception("TODO: Test not implemented yet!");
+        }
+    }
 }
