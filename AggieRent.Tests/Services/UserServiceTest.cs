@@ -217,13 +217,65 @@ namespace AggieRent.Tests.Services
         [Fact]
         public void GetUserById_GoodId_ThenReturnUser()
         {
-            throw new Exception("TODO: Test not implemented yet!");
+            var mockUserRepository = new Mock<IUserRepository>();
+            List<User> users =
+            [
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "admin@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    Role = UserRole.Admin
+                },
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("awesomeStr0ngP@ssw0rd"),
+                    Role = UserRole.User
+                }
+            ];
+            mockUserRepository
+                .Setup(x => x.Get(It.IsAny<string>()))
+                .Returns((string userId) => users.Find(u => u.UserId == userId));
+            var userService = new UserService(mockUserRepository.Object);
+
+            var testEmail = users[0].UserId;
+            var user = userService.GetUserById(testEmail);
+
+            Assert.Equivalent(users[0], user);
         }
 
         [Fact]
         public void GetUserById_UnknownId_ThenArgumentException()
         {
-            throw new Exception("TODO: Test not implemented yet!");
+            var mockUserRepository = new Mock<IUserRepository>();
+            List<User> users =
+            [
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "admin@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    Role = UserRole.Admin
+                },
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("awesomeStr0ngP@ssw0rd"),
+                    Role = UserRole.User
+                }
+            ];
+            mockUserRepository
+                .Setup(x => x.Get(It.IsAny<string>()))
+                .Returns((string userId) => users.Find(u => u.UserId == userId));
+            var userService = new UserService(mockUserRepository.Object);
+
+            void action() => userService.GetUserById(Guid.NewGuid().ToString());
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("User not found", ae.Message);
         }
     }
 
