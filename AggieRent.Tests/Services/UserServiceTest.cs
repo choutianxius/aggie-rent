@@ -71,7 +71,8 @@ namespace AggieRent.Tests.Services
                 {
                     Email = "aggie@tamu.edu",
                     HashedPassword = BC.HashPassword("VerysecretP@ssw0rd"),
-                    UserId = Guid.NewGuid().ToString()
+                    UserId = Guid.NewGuid().ToString(),
+                    Role = UserRole.User
                 }
             ];
             mockUserRepository.Setup(x => x.GetAll()).Returns(users.AsQueryable());
@@ -128,7 +129,8 @@ namespace AggieRent.Tests.Services
                 {
                     Email = testEmail,
                     HashedPassword = BC.HashPassword(testPassword),
-                    UserId = Guid.NewGuid().ToString()
+                    UserId = Guid.NewGuid().ToString(),
+                    Role = UserRole.User
                 }
             ];
             mockUserRepository.Setup(x => x.GetAll()).Returns(users.AsQueryable());
@@ -167,7 +169,8 @@ namespace AggieRent.Tests.Services
                 {
                     Email = testEmail,
                     HashedPassword = BC.HashPassword(testPassword),
-                    UserId = Guid.NewGuid().ToString()
+                    UserId = Guid.NewGuid().ToString(),
+                    Role = UserRole.User
                 }
             ];
             mockUserRepository.Setup(x => x.GetAll()).Returns(users.AsQueryable());
@@ -282,21 +285,174 @@ namespace AggieRent.Tests.Services
     public class UserService_UpdateUserShould
     {
         [Fact]
-        public void UpdateUser_ThenUpdateNotNullMutableAttributes()
+        public void UpdateUser_MutableAttributes_ThenUpdate()
         {
-            throw new Exception("TODO: Test not implemented yet!");
+            var mockUserRepository = new Mock<IUserRepository>();
+            List<User> users =
+            [
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "admin@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    Role = UserRole.Admin
+                },
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("awesomeStr0ngP@ssw0rd"),
+                    Role = UserRole.User
+                }
+            ];
+            mockUserRepository
+                .Setup(x => x.Get(It.IsAny<string>()))
+                .Returns((string userId) => users.Find(u => u.UserId == userId));
+            mockUserRepository
+                .Setup(x => x.Update(It.IsAny<User>()))
+                .Callback(
+                    (User newUser) =>
+                    {
+                        var existingUserIdx = users.FindIndex(u => u.UserId == newUser.UserId);
+                        users[existingUserIdx] = newUser;
+                    }
+                );
+            var userService = new UserService(mockUserRepository.Object);
+            var oldAdminCopy = new User()
+            {
+                UserId = users[0].UserId,
+                Email = users[0].Email,
+                HashedPassword = users[0].HashedPassword,
+                Role = users[0].Role
+            };
+            var oldUserCopy = new User()
+            {
+                UserId = users[1].UserId,
+                Email = users[1].Email,
+                HashedPassword = users[1].HashedPassword,
+                Role = users[1].Role
+            };
+
+            var newUser = new User()
+            {
+                UserId = oldUserCopy.UserId,
+                Email = oldUserCopy.Email,
+                HashedPassword = oldUserCopy.HashedPassword,
+                Role = UserRole.Admin
+            };
+            userService.UpdateUser(newUser);
+
+            Assert.Equal(2, users.Count);
+            Assert.Equivalent(oldAdminCopy, users[0]);
+            Assert.Equal(oldUserCopy.UserId, users[1].UserId);
+            Assert.Equal(oldUserCopy.Email, users[1].Email);
+            Assert.Equal(oldUserCopy.HashedPassword, users[1].HashedPassword);
+            Assert.Equal(newUser.Role, users[1].Role);
         }
 
         [Fact]
         public void UpdateUser_TryUpdateImmutableAttributes_ThenNotUpdated()
         {
-            throw new Exception("TODO: Test not implemented yet!");
+            var mockUserRepository = new Mock<IUserRepository>();
+            List<User> users =
+            [
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "admin@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    Role = UserRole.Admin
+                },
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("awesomeStr0ngP@ssw0rd"),
+                    Role = UserRole.User
+                }
+            ];
+            mockUserRepository
+                .Setup(x => x.Get(It.IsAny<string>()))
+                .Returns((string userId) => users.Find(u => u.UserId == userId));
+            mockUserRepository
+                .Setup(x => x.Update(It.IsAny<User>()))
+                .Callback(
+                    (User newUser) =>
+                    {
+                        var existingUserIdx = users.FindIndex(u => u.UserId == newUser.UserId);
+                        users[existingUserIdx] = newUser;
+                    }
+                );
+            var userService = new UserService(mockUserRepository.Object);
+            var oldAdminCopy = new User()
+            {
+                UserId = users[0].UserId,
+                Email = users[0].Email,
+                HashedPassword = users[0].HashedPassword,
+                Role = users[0].Role
+            };
+            var oldUserCopy = new User()
+            {
+                UserId = users[1].UserId,
+                Email = users[1].Email,
+                HashedPassword = users[1].HashedPassword,
+                Role = users[1].Role
+            };
+
+            var newUser = new User()
+            {
+                UserId = oldUserCopy.UserId,
+                Email = "aggie123@tamu.edu",
+                HashedPassword = BC.HashPassword("newp@ssW0rd"),
+                Role = oldUserCopy.Role
+            };
+            userService.UpdateUser(newUser);
+
+            Assert.Equal(2, users.Count);
+            Assert.Equivalent(oldAdminCopy, users[0]);
+            Assert.Equal(oldUserCopy.UserId, users[1].UserId);
+            Assert.Equal(oldUserCopy.Email, users[1].Email);
+            Assert.Equal(oldUserCopy.HashedPassword, users[1].HashedPassword);
+            Assert.Equal(oldUserCopy.Role, users[1].Role);
         }
 
         [Fact]
         public void UpdateUser_UnknownUser_ThenArgumentException()
         {
-            throw new Exception("TODO: Test not implemented yet!");
+            var mockUserRepository = new Mock<IUserRepository>();
+            List<User> users =
+            [
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "admin@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    Role = UserRole.Admin
+                },
+                new()
+                {
+                    UserId = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("awesomeStr0ngP@ssw0rd"),
+                    Role = UserRole.User
+                }
+            ];
+            mockUserRepository
+                .Setup(x => x.Get(It.IsAny<string>()))
+                .Returns((string userId) => users.Find(u => u.UserId == userId));
+            var userService = new UserService(mockUserRepository.Object);
+
+            var newUser = new User()
+            {
+                UserId = Guid.NewGuid().ToString(),
+                Email = users[1].Email,
+                HashedPassword = users[1].HashedPassword,
+                Role = users[1].Role
+            };
+            void action() => userService.UpdateUser(newUser);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("User not found", ae.Message);
         }
     }
 

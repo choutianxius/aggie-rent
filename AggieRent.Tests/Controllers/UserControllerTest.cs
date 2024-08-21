@@ -20,7 +20,8 @@ namespace AggieRent.Tests.Controllers
                 {
                     Email = "aggie@tamu.edu",
                     HashedPassword = BC.HashPassword("verySecretP@ssw0rd"),
-                    UserId = Guid.NewGuid().ToString()
+                    UserId = Guid.NewGuid().ToString(),
+                    Role = UserRole.User
                 }
             ];
             mockUserService.Setup(x => x.GetUsers()).Returns(testUsers);

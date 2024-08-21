@@ -2,18 +2,10 @@ using AggieRent.Models;
 
 namespace AggieRent.DTOs
 {
-    public class UserSummaryDTO
+    public class UserSummaryDTO(User user)
     {
-        public string Email { get; set; } = "";
-        public UserRole Role { get; set; }
-
-        public UserSummaryDTO() { }
-
-        public UserSummaryDTO(User user)
-        {
-            Email = user.Email;
-            Role = user.Role;
-        }
+        public string Email { get; set; } = user.Email;
+        public UserRole Role { get; set; } = user.Role;
     }
 
     public class UserRegisterDTO

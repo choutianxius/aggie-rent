@@ -32,7 +32,8 @@ namespace AggieRent.Services
                 {
                     UserId = Guid.NewGuid().ToString(),
                     Email = normalizedEmail,
-                    HashedPassword = BC.HashPassword(password)
+                    HashedPassword = BC.HashPassword(password),
+                    Role = UserRole.User
                 };
             _userRepository.Add(user);
         }
