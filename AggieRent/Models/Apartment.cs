@@ -62,7 +62,7 @@ namespace AggieRent.Models
         public required string ZipCode { get; set; }
 
         [Column("occupied")]
-        public required string Occupied { get; set; }
+        public required bool Occupied { get; set; }
 
         public ICollection<Applicant>? Applicants { get; set; }
     }
