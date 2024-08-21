@@ -28,4 +28,10 @@ namespace AggieRent.Models
         User,
         Admin
     }
+
+    public class Admin { }
+
+    public class Owner { }
+
+    public class Applicant { }
 }
