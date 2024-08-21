@@ -20,7 +20,7 @@ namespace AggieRent.Models
         public UserRole Role { get; set; }
 
         [Column("wish_list")]
-        public IQueryable<Apartment>? WishList { get; set; }
+        public ICollection<Apartment>? WishList { get; set; }
     }
 
     public enum UserRole

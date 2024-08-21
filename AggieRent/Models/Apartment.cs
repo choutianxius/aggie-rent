@@ -10,6 +10,7 @@ namespace AggieRent.Models
         [Key]
         [Column("apt_id")]
         public required string AptId { get; set; }
+
         public required Owner Owner { get; set; }
 
         [Column("owner_id")]
@@ -62,6 +63,7 @@ namespace AggieRent.Models
 
         [Column("occupied")]
         public required string Occupied { get; set; }
+
         public ICollection<Applicant>? Applicants { get; set; }
     }
 
