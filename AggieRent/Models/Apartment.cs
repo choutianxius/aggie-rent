@@ -1,23 +1,22 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using AggieRent.Common;
 
 namespace AggieRent.Models
 {
-    [Table("Apartment")]
+    [Table("apartment")]
     public class Apartment
     {
         [Key]
-        [Column("apt_id")]
-        public required string AptId { get; set; }
-
-        public required Owner Owner { get; set; }
+        [Column("id")]
+        public required string Id { get; set; }
 
         [Column("owner_id")]
         public required string OwnerId { get; set; }
 
-        [Column("last_edit_at")]
-        public required DateTime LastEditAt { get; set; }
+        public required Owner Owner { get; set; }
+
+        [Column("last_edited_at")]
+        public required DateTime LastEditedAt { get; set; }
 
         [Column("name")]
         public required string Name { get; set; }
@@ -64,7 +63,7 @@ namespace AggieRent.Models
         [Column("occupied")]
         public required bool Occupied { get; set; }
 
-        public ICollection<Applicant>? Applicants { get; set; }
+        public ICollection<Applicant> Applicants { get; set; } = [];
     }
 
     public enum USState
