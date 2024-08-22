@@ -14,8 +14,8 @@ namespace AggieRent.Models
         [Column("gender")]
         public Gender Gender { get; set; }
 
-        [Column("age")]
-        public int? Age { get; set; }
+        [Column("birthday")]
+        public DateOnly? Birthday { get; set; }
 
         [Column("description")]
         public string? Description { get; set; }

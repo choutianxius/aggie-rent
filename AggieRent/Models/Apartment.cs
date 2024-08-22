@@ -37,7 +37,7 @@ namespace AggieRent.Models
         public required int AptCount { get; set; }
 
         [Column("photo_urls")]
-        public ICollection<string>? PhotoUrls { get; set; }
+        public ICollection<string> PhotoUrls { get; set; } = [];
 
         [Column("available_from")]
         public required DateOnly AvailableFrom { get; set; }
