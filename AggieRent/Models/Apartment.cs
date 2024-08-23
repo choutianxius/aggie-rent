@@ -55,7 +55,7 @@ namespace AggieRent.Models
         public required string City { get; set; }
 
         [Column("state")]
-        public required USState State { get; set; }
+        public required UsState State { get; set; }
 
         [Column("zip_code")]
         public required string ZipCode { get; set; }
@@ -66,7 +66,7 @@ namespace AggieRent.Models
         public ICollection<Applicant> Applicants { get; set; } = [];
     }
 
-    public enum USState
+    public enum UsState
     {
         Alabama,
         Alaska,

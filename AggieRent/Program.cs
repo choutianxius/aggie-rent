@@ -23,7 +23,8 @@ var dataSourceBuilder = new NpgsqlDataSourceBuilder(
 );
 
 // Specify all persisted enums here
-dataSourceBuilder.MapEnum<UserRole>();
+dataSourceBuilder.MapEnum<UsState>();
+dataSourceBuilder.MapEnum<Gender>();
 var dataSource = dataSourceBuilder.Build();
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseNpgsql(dataSource));
 

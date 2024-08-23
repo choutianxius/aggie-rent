@@ -22,7 +22,7 @@ namespace AggieRent.Models
 
         public ICollection<Apartment> AppliedApartments { get; set; } = [];
 
-        public ICollection<Apartment> WishList { get; set; } = [];
+        public ICollection<Apartment> WishedApartments { get; set; } = [];
 
         [Column("occupied_apartment_id")]
         public string? OccupiedApartmentId { get; set; }
