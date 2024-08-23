@@ -9,11 +9,25 @@ namespace AggieRent.DTOs
 
         public UserSummaryDTO() { }
 
-        public UserSummaryDTO(User user)
+        public UserSummaryDTO(BaseUser user)
         {
             Email = user.Email;
-            Role = user.Role;
+            if (user is Applicant)
+                Role = UserRole.Applicant;
+            else if (user is Owner)
+                Role = UserRole.Owner;
+            else if (user is Admin)
+                Role = UserRole.Admin;
+            else
+                throw new ArgumentException($"Invalid user class {user.GetType()}");
         }
+    }
+
+    public enum UserRole
+    {
+        Applicant,
+        Owner,
+        Admin
     }
 
     public class UserRegisterDTO
