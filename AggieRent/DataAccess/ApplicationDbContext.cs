@@ -6,7 +6,7 @@ namespace AggieRent.DataAccess
     public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
         : DbContext(options)
     {
-        public required DbSet<Applicant> Users { get; set; }
+        public required DbSet<Applicant> Applicants { get; set; }
         public required DbSet<Owner> Owners { get; set; }
         public required DbSet<Admin> Admins { get; set; }
         public required DbSet<Apartment> Apartments { get; set; }
