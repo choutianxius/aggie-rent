@@ -10,6 +10,14 @@ namespace AggieRent.Services
 
         Admin LoginAdmin(string email, string password);
 
-        // TODO: Registration methods
+        void RegisterApplicant(
+            string email,
+            string password,
+            string firstName,
+            string lastName,
+            Gender gender,
+            DateOnly? birthday,
+            string? description
+        );
     }
 }
