@@ -5,7 +5,7 @@ using AggieRent.Models;
 
 namespace AggieRent.Services
 {
-    public class AuthService(
+    public partial class AuthService(
         IApplicantRepository applicantRepository,
         IOwnerRepository ownerRepository,
         IAdminRepository adminRepository
@@ -44,7 +44,7 @@ namespace AggieRent.Services
             var applicant = new Applicant()
             {
                 Id = Guid.NewGuid().ToString(),
-                Email = email,
+                Email = NormalizeEmail(email),
                 HashedPassword = BC.HashPassword(password),
                 FirstName = firstName,
                 LastName = lastName,

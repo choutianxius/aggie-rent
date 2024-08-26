@@ -48,8 +48,12 @@ builder
         };
     });
 
-builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddScoped<IUserService, UserService>();
+// di
+builder.Services.AddScoped<IApplicantRepository, ApplicantRepository>();
+builder.Services.AddScoped<IOwnerRepository, OwnerRepository>();
+builder.Services.AddScoped<IAdminRepository, AdminRepository>();
+builder.Services.AddScoped<IApartmentRepository, ApartmentRepository>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -77,7 +81,7 @@ else
         new()
         {
             Secure = CookieSecurePolicy.SameAsRequest,
-            HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always
+            HttpOnly = Microsoft.AspNetCore.CookiePolicy.HttpOnlyPolicy.Always,
         }
     );
     app.MapControllers();
