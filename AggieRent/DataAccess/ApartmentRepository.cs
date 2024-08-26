@@ -9,6 +9,11 @@ namespace AggieRent.DataAccess
 
         public Apartment? Get(string id)
         {
+            return _context.Apartments.FirstOrDefault(apt => apt.Id == id);
+        }
+
+        public Apartment? GetVerbose(string id)
+        {
             return _context
                 .Apartments.Include(apt => apt.Applicants)
                 .FirstOrDefault(apt => apt.Id == id);

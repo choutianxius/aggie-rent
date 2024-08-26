@@ -11,6 +11,11 @@ namespace AggieRent.DataAccess
             return _context.Admins.FirstOrDefault(a => a.Id == id);
         }
 
+        public Admin? GetVerbose(string id)
+        {
+            return _context.Admins.FirstOrDefault(a => a.Id == id);
+        }
+
         public IQueryable<Admin> GetAll()
         {
             return _context.Admins;

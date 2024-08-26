@@ -9,6 +9,11 @@ namespace AggieRent.DataAccess
 
         public Applicant? Get(string id)
         {
+            return _context.Applicants.FirstOrDefault(a => a.Id == id);
+        }
+
+        public Applicant? GetVerbose(string id)
+        {
             return _context
                 .Applicants.Include(a => a.AppliedApartments)
                 .Include(a => a.WishedApartments)

@@ -4,6 +4,8 @@ namespace AggieRent.DataAccess
     {
         TEntity? Get(string id);
 
+        TEntity? GetVerbose(string id);
+
         IQueryable<TEntity> GetAll();
 
         void Add(TEntity entity);

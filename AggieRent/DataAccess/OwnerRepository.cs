@@ -9,6 +9,11 @@ namespace AggieRent.DataAccess
 
         public Owner? Get(string id)
         {
+            return _context.Owners.FirstOrDefault(o => o.Id == id);
+        }
+
+        public Owner? GetVerbose(string id)
+        {
             return _context.Owners.Include(o => o.OwnedApartments).FirstOrDefault(o => o.Id == id);
         }
 
