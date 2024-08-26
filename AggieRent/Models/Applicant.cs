@@ -35,6 +35,6 @@ namespace AggieRent.Models
         NotSet,
         Female,
         Male,
-        NonBinary
+        NonBinary,
     }
 }

@@ -19,7 +19,7 @@ namespace AggieRent.Controllers
         {
             Applicant,
             Owner,
-            Admin
+            Admin,
         }
 
         [Route("/login/{type}")]
@@ -36,10 +36,9 @@ namespace AggieRent.Controllers
                     UserType.Applicant => _authService.LoginApplicant(body.Email, body.Password),
                     UserType.Owner => _authService.LoginOwner(body.Email, body.Password),
                     UserType.Admin => _authService.LoginAdmin(body.Email, body.Password),
-                    _
-                        => throw new ArgumentException(
-                            "Unknown user type, must be applicant, owner or admin"
-                        )
+                    _ => throw new ArgumentException(
+                        "Unknown user type, must be applicant, owner or admin"
+                    ),
                 };
 
                 // cookie-based authentication
@@ -48,10 +47,9 @@ namespace AggieRent.Controllers
                     UserType.Applicant => ApplicationConstants.UserRoleClaim.Applicant,
                     UserType.Owner => ApplicationConstants.UserRoleClaim.Owner,
                     UserType.Admin => ApplicationConstants.UserRoleClaim.Admin,
-                    _
-                        => throw new ArgumentException(
-                            "Unknown user type, must be applicant, owner or admin"
-                        )
+                    _ => throw new ArgumentException(
+                        "Unknown user type, must be applicant, owner or admin"
+                    ),
                 };
                 var claims = new List<Claim>()
                 {

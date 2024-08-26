@@ -123,8 +123,8 @@ namespace AggieRent.Tests.Services
                     Email = email.ToLower(),
                     HashedPassword = BC.HashPassword("SUperStr0ngP@ssw0rd"),
                     FirstName = "John",
-                    LastName = "Doe"
-                }
+                    LastName = "Doe",
+                },
             ];
             mockApplicantRepository.Setup(x => x.GetAll()).Returns(applicants.AsQueryable());
             mockApplicantRepository
@@ -238,8 +238,8 @@ namespace AggieRent.Tests.Services
                     LastName = testLastName,
                     Gender = testGender,
                     Birthday = testBirthday,
-                    Description = testDescription
-                }
+                    Description = testDescription,
+                },
             ];
             mockApplicantRepository.Setup(x => x.GetAll()).Returns(applicants.AsQueryable());
             var authService = new AuthService(
@@ -299,8 +299,8 @@ namespace AggieRent.Tests.Services
                     LastName = testLastName,
                     Gender = testGender,
                     Birthday = testBirthday,
-                    Description = testDescription
-                }
+                    Description = testDescription,
+                },
             ];
             mockApplicantRepository.Setup(x => x.GetAll()).Returns(applicants.AsQueryable());
             var authService = new AuthService(

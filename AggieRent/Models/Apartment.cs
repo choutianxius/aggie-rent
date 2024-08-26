@@ -117,6 +117,6 @@ namespace AggieRent.Models
         Washington,
         WestVirginia,
         Wisconsin,
-        Wyoming
+        Wyoming,
     }
 }

@@ -50,7 +50,7 @@ namespace AggieRent.Services
                 LastName = lastName,
                 Gender = gender,
                 Birthday = birthday,
-                Description = description
+                Description = description,
             };
             _applicantRepository.Add(applicant);
         }
