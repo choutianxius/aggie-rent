@@ -10,37 +10,47 @@ using Microsoft.AspNetCore.Mvc;
 namespace AggieRent.Controllers
 {
     [ApiController]
-    public class AuthController(IUserService userService) : ControllerBase
+    [Route("/api/auth")]
+    public class AuthController(IAuthService authService) : ControllerBase
     {
-        private readonly IUserService _userService = userService;
+        private readonly IAuthService _authService = authService;
 
-        [Route("/api/register")]
-        [HttpPost]
-        public IActionResult Register([FromBody] UserRegisterDTO userRegisterDto)
+        public enum UserType
         {
-            try
-            {
-                _userService.Register(userRegisterDto.Email, userRegisterDto.Password);
-                return Ok();
-            }
-            catch (ArgumentException ae)
-            {
-                return BadRequest(new ErrorResponseDTO(ae.Message));
-            }
+            Applicant,
+            Owner,
+            Admin,
         }
 
-        [Route("/api/login")]
+        [Route("/login/{type}")]
         [HttpPost]
-        public async Task<IActionResult> Login([FromBody] UserLoginDTO userLoginDto)
+        public async Task<IActionResult> Login(
+            [FromBody] LoginDTO body,
+            [FromRoute(Name = "type")] UserType userType
+        )
         {
             try
             {
-                var user = _userService.Login(userLoginDto.Email, userLoginDto.Password);
+                BaseUser user = userType switch
+                {
+                    UserType.Applicant => _authService.LoginApplicant(body.Email, body.Password),
+                    UserType.Owner => _authService.LoginOwner(body.Email, body.Password),
+                    UserType.Admin => _authService.LoginAdmin(body.Email, body.Password),
+                    _ => throw new ArgumentException(
+                        "Unknown user type, must be applicant, owner or admin"
+                    ),
+                };
 
                 // cookie-based authentication
-                string claimedRole = user.Role.Equals(UserRole.Admin)
-                    ? ApplicationConstants.UserRoleClaim.Admin
-                    : ApplicationConstants.UserRoleClaim.User;
+                string claimedRole = userType switch
+                {
+                    UserType.Applicant => ApplicationConstants.UserRoleClaim.Applicant,
+                    UserType.Owner => ApplicationConstants.UserRoleClaim.Owner,
+                    UserType.Admin => ApplicationConstants.UserRoleClaim.Admin,
+                    _ => throw new ArgumentException(
+                        "Unknown user type, must be applicant, owner or admin"
+                    ),
+                };
                 var claims = new List<Claim>()
                 {
                     new(ClaimTypes.Name, user.Email),
@@ -65,12 +75,39 @@ namespace AggieRent.Controllers
             }
         }
 
-        [Route("/api/logout")]
+        [Route("/logout")]
         [HttpPost]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync();
             return Ok();
+        }
+
+        [Route("/register/applicant")]
+        [HttpPost]
+        public IActionResult RegisterApplicant([FromBody] ApplicantRegistrationDTO body)
+        {
+            try
+            {
+                _authService.RegisterApplicant(
+                    body.Email,
+                    body.Password,
+                    body.FirstName,
+                    body.LastName,
+                    body.Gender,
+                    body.Birthday,
+                    body.Description
+                );
+                return Created();
+            }
+            catch (ArgumentException ae)
+            {
+                return BadRequest(new ErrorResponseDTO(ae));
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, new ErrorResponseDTO(e));
+            }
         }
     }
 }

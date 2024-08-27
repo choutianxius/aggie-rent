@@ -5,77 +5,128 @@ using AggieRent.DTOs;
 using AggieRent.Models;
 using AggieRent.Services;
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using Npgsql.TypeMapping;
 using Xunit;
 
 namespace AggieRent.Tests.Controllers
 {
-    public class UserController_RegisterShould
+    public class AuthController_RegisterApplicantShould
     {
         [Fact]
-        public void Register_GoodInput_Then200Ok()
+        public void RegisterApplicant_GoodInput_Then201Created()
         {
-            var mockUserService = new Mock<IUserService>();
-            var authController = new AuthController(mockUserService.Object);
+            var mockAuthService = new Mock<IAuthService>();
+            var authController = new AuthController(mockAuthService.Object);
 
-            var userRegisterDto = new UserRegisterDTO()
-            {
-                Email = "aggie@tamu.edu",
-                Password = "verySecretP@ssw0rd"
-            };
-            var response = authController.Register(userRegisterDto);
+            var dto = new ApplicantRegistrationDTO(
+                "aggie@tamu.edu",
+                "veryStr0ngP@ssw0rd",
+                "John",
+                "Doe",
+                Gender.Female,
+                DateOnly.FromDateTime(DateTime.UtcNow),
+                "Hi, I'm John Doe"
+            );
+            var response = authController.RegisterApplicant(dto);
 
-            Assert.IsType<OkResult>(response);
-            mockUserService.Verify(
-                service => service.Register(userRegisterDto.Email, userRegisterDto.Password),
+            Assert.IsType<CreatedResult>(response);
+            mockAuthService.Verify(
+                service =>
+                    service.RegisterApplicant(
+                        dto.Email,
+                        dto.Password,
+                        dto.FirstName,
+                        dto.LastName,
+                        dto.Gender,
+                        dto.Birthday,
+                        dto.Description
+                    ),
                 Times.Once()
             );
         }
 
         [Fact]
-        public void Register_ServiceArgumentException_Then400BadRequest()
+        public void RegisterApplicant_ServiceArgumentException_Then400BadRequest()
         {
-            var mockUserService = new Mock<IUserService>();
+            var mockAuthService = new Mock<IAuthService>();
             string testErrorMessage = "Some error message";
-            mockUserService
-                .Setup(x => x.Register(It.IsAny<string>(), It.IsAny<string>()))
+            mockAuthService
+                .Setup(x =>
+                    x.RegisterApplicant(
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<string>(),
+                        It.IsAny<Gender>(),
+                        It.IsAny<DateOnly?>(),
+                        It.IsAny<string?>()
+                    )
+                )
                 .Throws(new ArgumentException(testErrorMessage));
-            var authController = new AuthController(mockUserService.Object);
 
-            var userRegisterDto = new UserRegisterDTO()
-            {
-                Email = "aggie@tamu.edu",
-                Password = "verySecretP@ssw0rd"
-            };
-            var response = authController.Register(userRegisterDto);
+            var authController = new AuthController(mockAuthService.Object);
+
+            var dto = new ApplicantRegistrationDTO(
+                "aggie@tamu.edu",
+                "veryStr0ngP@ssw0rd",
+                "John",
+                "Doe",
+                Gender.Female,
+                DateOnly.FromDateTime(DateTime.UtcNow),
+                "Hi, I'm John Doe"
+            );
+            var response = authController.RegisterApplicant(dto);
 
             var castResponse = Assert.IsType<BadRequestObjectResult>(response);
             Assert.Equivalent(new ErrorResponseDTO(testErrorMessage), castResponse.Value);
         }
     }
 
-    public class UserController_LoginShould
+    public class AuthController_LoginShould
     {
         [Theory]
-        [InlineData("user@tamu.edu", UserRole.User)]
-        [InlineData("admin@tamu.edu", UserRole.Admin)]
-        public async void Login_GoodInput_Then200OkWithUserSignedIn(string email, UserRole role)
+        [InlineData("applicant@tamu.edu", AuthController.UserType.Applicant)]
+        [InlineData("owner@tamu.edu", AuthController.UserType.Owner)]
+        [InlineData("admin@tamu.edu", AuthController.UserType.Admin)]
+        public async void Login_GoodInput_Then200OkWithUserSignedIn(
+            string email,
+            AuthController.UserType userType
+        )
         {
             // Arrange
-            var mockUserService = new Mock<IUserService>();
-            var testPassword = "veryStr0ngp@ssw0rd";
-            var user = new User()
+            var mockAuthService = new Mock<IAuthService>();
+            var applicant = new Applicant()
             {
-                Email = email.ToLower(),
-                HashedPassword = BC.HashPassword(testPassword),
-                UserId = Guid.NewGuid().ToString(),
-                Role = role
+                Id = Guid.NewGuid().ToString(),
+                Email = email,
+                HashedPassword = BC.HashPassword("verysTR0NGp@SSW0RD"),
+                FirstName = "John",
+                LastName = "Doe",
             };
-            mockUserService
-                .Setup(x => x.Login(It.IsAny<string>(), It.IsAny<string>()))
-                .Returns(user);
+            var owner = new Owner()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = email,
+                HashedPassword = BC.HashPassword("verysTR0NGp@SSW0RD"),
+                Name = "John Doe",
+            };
+            var admin = new Admin()
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = email,
+                HashedPassword = BC.HashPassword("verysTR0NGp@SSW0RD"),
+            };
+            mockAuthService
+                .Setup(x => x.LoginApplicant(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(applicant);
+            mockAuthService
+                .Setup(x => x.LoginOwner(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(owner);
+            mockAuthService
+                .Setup(x => x.LoginAdmin(It.IsAny<string>(), It.IsAny<string>()))
+                .Returns(admin);
 
             // Arrange authentication service, which is implicitly required by the SignInAsync method
             var capturedClaimsPrincipal = new ClaimsPrincipal();
@@ -102,40 +153,63 @@ namespace AggieRent.Tests.Controllers
                 .Setup(x => x.RequestServices.GetService(typeof(IAuthenticationService)))
                 .Returns(mockAuthenticationService.Object);
 
-            var authController = new AuthController(mockUserService.Object)
+            var authController = new AuthController(mockAuthService.Object)
             {
-                ControllerContext = new ControllerContext() { HttpContext = mockHttpContext.Object }
+                ControllerContext = new ControllerContext()
+                {
+                    HttpContext = mockHttpContext.Object,
+                },
             };
 
             // Act
             var response = await authController.Login(
-                new UserLoginDTO() { Email = email, Password = testPassword }
+                new LoginDTO(email, "verysTR0NGp@SSW0RD"),
+                userType
             );
 
             // Assert
             Assert.IsType<OkResult>(response);
-            var expectedRole = role.Equals(UserRole.Admin)
-                ? ApplicationConstants.UserRoleClaim.Admin
-                : ApplicationConstants.UserRoleClaim.User;
+            var expectedRole = userType switch
+            {
+                AuthController.UserType.Applicant => ApplicationConstants.UserRoleClaim.Applicant,
+                AuthController.UserType.Owner => ApplicationConstants.UserRoleClaim.Owner,
+                AuthController.UserType.Admin => ApplicationConstants.UserRoleClaim.Admin,
+                _ => throw new Exception("Bad UserType used in this test"),
+            };
             var claims = capturedClaimsPrincipal.Claims;
-            Assert.Contains(claims, c => c.Type == ClaimTypes.Name && c.Value == user.Email);
+            Assert.Contains(
+                claims,
+                c => c.Type == ClaimTypes.Name && c.Value.Equals(email.ToLower())
+            );
             Assert.Contains(claims, c => c.Type == ClaimTypes.Role && c.Value == expectedRole);
         }
 
-        [Fact]
-        public async void Login_UserServiceArgumentException_ThenBadRequestWithMessage()
+        [Theory]
+        [InlineData(AuthController.UserType.Applicant)]
+        [InlineData(AuthController.UserType.Owner)]
+        [InlineData(AuthController.UserType.Admin)]
+        public async void Login_AuthServiceArgumentException_ThenBadRequestWithMessage(
+            AuthController.UserType userType
+        )
         {
             // Arrange
-            var mockUserService = new Mock<IUserService>();
+            var mockAuthService = new Mock<IAuthService>();
             var testErrorMessage = "Some error message";
-            mockUserService
-                .Setup(x => x.Login(It.IsAny<string>(), It.IsAny<string>()))
+            mockAuthService
+                .Setup(x => x.LoginApplicant(It.IsAny<string>(), It.IsAny<string>()))
                 .Throws(new ArgumentException(testErrorMessage));
-            var authController = new AuthController(mockUserService.Object);
+            mockAuthService
+                .Setup(x => x.LoginOwner(It.IsAny<string>(), It.IsAny<string>()))
+                .Throws(new ArgumentException(testErrorMessage));
+            mockAuthService
+                .Setup(x => x.LoginAdmin(It.IsAny<string>(), It.IsAny<string>()))
+                .Throws(new ArgumentException(testErrorMessage));
+            var authController = new AuthController(mockAuthService.Object);
 
             // Act
             var response = await authController.Login(
-                new UserLoginDTO() { Email = "aggie@tamu.edu", Password = "strongP@ssw0rd" }
+                new LoginDTO("aggie@tamu.edu", "strongP@ssw0rd"),
+                userType
             );
 
             // Assert
@@ -149,7 +223,7 @@ namespace AggieRent.Tests.Controllers
         [Fact]
         public async void Logout_Then200Ok()
         {
-            var mockUserService = new Mock<IUserService>();
+            var mockAuthService = new Mock<IAuthService>();
             // Arrange authentication service, which is implicitly required by the SignInAsync method
             var mockHttpContext = new Mock<HttpContext>();
             var mockAuthenticationService = new Mock<IAuthenticationService>();
@@ -168,9 +242,12 @@ namespace AggieRent.Tests.Controllers
                 .Setup(x => x.RequestServices.GetService(typeof(IAuthenticationService)))
                 .Returns(mockAuthenticationService.Object);
 
-            var authController = new AuthController(mockUserService.Object)
+            var authController = new AuthController(mockAuthService.Object)
             {
-                ControllerContext = new ControllerContext() { HttpContext = mockHttpContext.Object }
+                ControllerContext = new ControllerContext()
+                {
+                    HttpContext = mockHttpContext.Object,
+                },
             };
 
             var response = await authController.Logout();
