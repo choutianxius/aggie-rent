@@ -35,7 +35,7 @@ namespace AggieRent.Services
             string password,
             string firstName,
             string lastName,
-            Gender gender = Gender.NotSet,
+            Gender? gender = Gender.NotSet,
             DateOnly? birthday = null,
             string? description = null
         )
@@ -48,7 +48,7 @@ namespace AggieRent.Services
                 HashedPassword = BC.HashPassword(password),
                 FirstName = firstName,
                 LastName = lastName,
-                Gender = gender,
+                Gender = gender ?? Gender.NotSet,
                 Birthday = birthday,
                 Description = description,
             };
