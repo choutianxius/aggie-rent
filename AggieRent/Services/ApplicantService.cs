@@ -53,7 +53,34 @@ namespace AggieRent.Services
             string? description
         )
         {
-            // TODO: Implement UpdateApplicant
+            var applicant =
+                _applicantRepository.Get(id)
+                ?? throw new ArgumentException("Applicant ID not found");
+
+            if (firstName != null)
+            {
+                if (firstName.Equals(""))
+                    throw new ArgumentException("First name cannot be empty");
+                applicant.FirstName = firstName;
+            }
+
+            if (lastName != null)
+            {
+                if (lastName.Equals(""))
+                    throw new ArgumentException("Last name cannot be empty");
+                applicant.LastName = lastName;
+            }
+
+            if (gender != null)
+                applicant.Gender = (Gender)gender!;
+
+            if (birthday != null)
+                applicant.Birthday = birthday!;
+
+            if (description != null)
+                applicant.Description = description;
+
+            _applicantRepository.Update(applicant);
         }
 
         public void DeleteApplicant(string id)
