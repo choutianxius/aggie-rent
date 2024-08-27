@@ -6,7 +6,7 @@ namespace AggieRent.Services
     {
         Applicant? GetApplicantById(string id);
 
-        IEnumerable<Applicant> GetApplicants(string id);
+        IEnumerable<Applicant> GetApplicants();
 
         string CreateApplicant(
             string email,
@@ -20,8 +20,6 @@ namespace AggieRent.Services
 
         void UpdateApplicant(
             string id,
-            string? email,
-            string? password,
             string? firstName,
             string? lastName,
             Gender? gender,
