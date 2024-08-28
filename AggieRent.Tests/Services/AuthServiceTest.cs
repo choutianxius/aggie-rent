@@ -316,14 +316,13 @@ namespace AggieRent.Tests.Services
         }
     }
 
-    // Tests for LoginOwner
     public class AuthService_LoginOwnerShould
     {
         Mock<IAdminRepository> mockAdminRepository = new Mock<IAdminRepository>();
         Mock<IApplicantRepository> mockApplicantRepository = new Mock<IApplicantRepository>();
 
         [Fact]
-        public void loginOwner_ValidCredentials_ThenReturnOwner()
+        public void LoginOwner_ValidCredentials_ThenReturnOwner()
         {
             var mockOwnerRepository = new Mock<IOwnerRepository>();
 
@@ -412,7 +411,6 @@ namespace AggieRent.Tests.Services
         }
     }
 
-    // Tests for LoginAdmin
     public class AuthService_LoginAdminShould
     {
         Mock<IApplicantRepository> mockApplicantRepository = new Mock<IApplicantRepository>();
