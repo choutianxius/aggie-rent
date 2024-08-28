@@ -343,7 +343,7 @@ namespace AggieRent.Tests.Services
                 },
             ];
 
-            mockOwnerRepository.Setup(x => x.GetAll()).Returns(owners.AsQueryable);
+            mockOwnerRepository.Setup(x => x.GetAll()).Returns(owners.AsQueryable());
             var authService = new AuthService(
                 mockApplicantRepository.Object,
                 mockOwnerRepository.Object,
@@ -362,7 +362,7 @@ namespace AggieRent.Tests.Services
             var testPassword = "Strongp@ssword1";
 
             List<Owner> emptyOwnersList = [];
-            mockOwnerRepository.Setup(x => x.GetAll()).Returns(emptyOwnersList.AsQueryable);
+            mockOwnerRepository.Setup(x => x.GetAll()).Returns(emptyOwnersList.AsQueryable());
 
             var authService = new AuthService(
                 mockApplicantRepository.Object,
@@ -398,7 +398,7 @@ namespace AggieRent.Tests.Services
                 },
             ];
 
-            mockOwnerRepository.Setup(x => x.GetAll()).Returns(owners.AsQueryable);
+            mockOwnerRepository.Setup(x => x.GetAll()).Returns(owners.AsQueryable());
             var authService = new AuthService(
                 mockApplicantRepository.Object,
                 mockOwnerRepository.Object,
@@ -417,7 +417,7 @@ namespace AggieRent.Tests.Services
         Mock<IOwnerRepository> mockOwnerRepository = new Mock<IOwnerRepository>();
 
         [Fact]
-        public void loginAdmin_ValidCredentials_ThenReturnAdmin()
+        public void LoginAdmin_ValidCredentials_ThenReturnAdmin()
         {
             var mockAdminRepository = new Mock<IAdminRepository>();
 
@@ -434,7 +434,7 @@ namespace AggieRent.Tests.Services
                 },
             ];
 
-            mockAdminRepository.Setup(x => x.GetAll()).Returns(admins.AsQueryable);
+            mockAdminRepository.Setup(x => x.GetAll()).Returns(admins.AsQueryable());
             var authService = new AuthService(
                 mockApplicantRepository.Object,
                 mockOwnerRepository.Object,
