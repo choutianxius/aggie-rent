@@ -316,6 +316,185 @@ namespace AggieRent.Tests.Services
         }
     }
 
-    // TODO: Test LoginOwner
-    // TODO: Test LoginAdmin
+    public class AuthService_LoginOwnerShould
+    {
+        Mock<IAdminRepository> mockAdminRepository = new Mock<IAdminRepository>();
+        Mock<IApplicantRepository> mockApplicantRepository = new Mock<IApplicantRepository>();
+
+        [Fact]
+        public void LoginOwner_ValidCredentials_ThenReturnOwner()
+        {
+            var mockOwnerRepository = new Mock<IOwnerRepository>();
+
+            var testEmail = "owner@niceestate.com";
+            var testName = "Nice Estate";
+            var testPassword = "Verystrongp@ssword";
+            var testDescription = "Official account for apartment owner Nice Estate";
+
+            List<Owner> owners =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = testEmail,
+                    Name = testName,
+                    HashedPassword = BC.HashPassword(testPassword),
+                    Description = testDescription,
+                },
+            ];
+
+            mockOwnerRepository.Setup(x => x.GetAll()).Returns(owners.AsQueryable());
+            var authService = new AuthService(
+                mockApplicantRepository.Object,
+                mockOwnerRepository.Object,
+                mockAdminRepository.Object
+            );
+
+            var owner = authService.LoginOwner(testEmail, testPassword);
+            Assert.Equivalent(owners[0], owner);
+        }
+
+        [Fact]
+        public void LoginOwner_UnknownEmail_ThenArgumentException()
+        {
+            var mockOwnerRepository = new Mock<IOwnerRepository>();
+            var testEmail = "unknownowner@unkownestate.com";
+            var testPassword = "Strongp@ssword1";
+
+            List<Owner> emptyOwnersList = [];
+            mockOwnerRepository.Setup(x => x.GetAll()).Returns(emptyOwnersList.AsQueryable());
+
+            var authService = new AuthService(
+                mockApplicantRepository.Object,
+                mockOwnerRepository.Object,
+                mockAdminRepository.Object
+            );
+            // Capture the action of logging in
+            void action() => authService.LoginOwner(testEmail, testPassword);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Email not registered!", ae.Message);
+        }
+
+        [Fact]
+        public void LoginOwner_WrongPassword_ThenArgumentException()
+        {
+            var mockOwnerRepository = new Mock<IOwnerRepository>();
+            var testEmail = "owner@niceestate.com";
+            var testName = "Nice Estate";
+            var testPassword = "Verystrongp@ssword";
+            var wrongPassword = "Wrongp@ssword";
+            var testDescription = "Official account for apartment owner Nice Estate";
+
+            List<Owner> owners =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = testEmail,
+                    Name = testName,
+                    HashedPassword = BC.HashPassword(testPassword),
+                    Description = testDescription,
+                },
+            ];
+
+            mockOwnerRepository.Setup(x => x.GetAll()).Returns(owners.AsQueryable());
+            var authService = new AuthService(
+                mockApplicantRepository.Object,
+                mockOwnerRepository.Object,
+                mockAdminRepository.Object
+            );
+            void action() => authService.LoginOwner(testEmail, wrongPassword);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Wrong password!", ae.Message);
+        }
+    }
+
+    public class AuthService_LoginAdminShould
+    {
+        Mock<IApplicantRepository> mockApplicantRepository = new Mock<IApplicantRepository>();
+        Mock<IOwnerRepository> mockOwnerRepository = new Mock<IOwnerRepository>();
+
+        [Fact]
+        public void LoginAdmin_ValidCredentials_ThenReturnAdmin()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+
+            var testEmail = "admin@aggierent.com";
+            var testPassword = "Verystrongp@ssword";
+
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = testEmail,
+                    HashedPassword = BC.HashPassword(testPassword),
+                },
+            ];
+
+            mockAdminRepository.Setup(x => x.GetAll()).Returns(admins.AsQueryable());
+            var authService = new AuthService(
+                mockApplicantRepository.Object,
+                mockOwnerRepository.Object,
+                mockAdminRepository.Object
+            );
+
+            var admin = authService.LoginAdmin(testEmail, testPassword);
+            Assert.Equivalent(admins[0], admin);
+        }
+
+        [Fact]
+        public void LoginAdmin_UnknownEmail_ThenArgumentException()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            var testEmail = "notadmin@notadminemail.com";
+            var testPassword = "Strongp@ssword1";
+
+            List<Admin> emptyAdminsList = [];
+            mockAdminRepository.Setup(x => x.GetAll()).Returns(emptyAdminsList.AsQueryable());
+
+            var authService = new AuthService(
+                mockApplicantRepository.Object,
+                mockOwnerRepository.Object,
+                mockAdminRepository.Object
+            );
+            // Capture the action of logging in
+            void action() => authService.LoginAdmin(testEmail, testPassword);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Email not registered!", ae.Message);
+        }
+
+        [Fact]
+        public void LoginAdmin_WrongPassword_ThenArgumentException()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            var testEmail = "admin@aggierent.com";
+            var testPassword = "Verystrongp@ssword";
+            var wrongPassword = "Notadminp@assword";
+
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = testEmail,
+                    HashedPassword = BC.HashPassword(testPassword),
+                },
+            ];
+
+            mockAdminRepository.Setup(x => x.GetAll()).Returns(admins.AsQueryable());
+            var authService = new AuthService(
+                mockApplicantRepository.Object,
+                mockOwnerRepository.Object,
+                mockAdminRepository.Object
+            );
+            void action() => authService.LoginAdmin(testEmail, wrongPassword);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Wrong password!", ae.Message);
+        }
+    }
 }
