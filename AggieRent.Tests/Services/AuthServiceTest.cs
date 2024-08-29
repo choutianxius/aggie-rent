@@ -485,7 +485,7 @@ namespace AggieRent.Tests.Services
                 },
             ];
 
-            mockAdminRepository.Setup(x => x.GetAll()).Returns(admins.AsQueryable);
+            mockAdminRepository.Setup(x => x.GetAll()).Returns(admins.AsQueryable());
             var authService = new AuthService(
                 mockApplicantRepository.Object,
                 mockOwnerRepository.Object,
