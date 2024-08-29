@@ -83,6 +83,18 @@ namespace AggieRent.Services
             _applicantRepository.Update(applicant);
         }
 
+        public void ResetApplicantEmail(string id, string newEmail)
+        {
+            // TODO: Implement ResetApplicantEmail
+            throw new Exception("Method not implemented yet!");
+        }
+
+        public void ResetApplicantPassword(string id, string newPassword)
+        {
+            // TODO: Implement ResetApplicantPassword
+            throw new Exception("Method not implemented yet!");
+        }
+
         public void DeleteApplicant(string id)
         {
             var applicant =

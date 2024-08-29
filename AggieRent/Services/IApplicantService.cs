@@ -27,6 +27,10 @@ namespace AggieRent.Services
             string? description
         );
 
+        void ResetApplicantEmail(string id, string newEmail);
+
+        void ResetApplicantPassword(string id, string newPassword);
+
         void DeleteApplicant(string id);
     }
 }
