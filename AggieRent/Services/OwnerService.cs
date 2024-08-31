@@ -55,11 +55,28 @@ public class OwnerService(IOwnerRepository ownerRepository) : IOwnerService
 
     public void ResetOwnerEmail(string id, string newEmail)
     {
-        throw new NotImplementedException("ResetOwnerEmail not implemented");
+        var owner = _ownerRepository.Get(id) ?? throw new ArgumentException("Owner ID not found");
+        if (!AuthUtils.ValidateEmail(newEmail))
+            throw new ArgumentException("Invalid Email format");
+
+        var normalizedEmail = AuthUtils.NormalizeEmail(newEmail);
+        var existingOwner = _ownerRepository
+            .GetAll()
+            .FirstOrDefault(u => u.Email == normalizedEmail);
+        if (existingOwner != null)
+            throw new ArgumentException("Email already in use!");
+        owner.Email = normalizedEmail;
+        _ownerRepository.Update(owner);
     }
 
     public void ResetOwnerPassword(string id, string newPassword)
     {
-        throw new NotImplementedException("ResetOwnerPasswor not implemented");
+        var owner = _ownerRepository.Get(id) ?? throw new ArgumentException("Owner ID not found");
+        if (!AuthUtils.ValidatePassword(newPassword))
+            throw new ArgumentException(
+                "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number"
+            );
+        owner.HashedPassword = BC.HashPassword(newPassword);
+        _ownerRepository.Update(owner);
     }
 }
