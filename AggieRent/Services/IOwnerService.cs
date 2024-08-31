@@ -6,7 +6,7 @@ namespace AggieRent.Services
     {
         Owner? GetOwnerById(string id);
 
-        IEnumerable<Owner> GetOwners(string id);
+        IEnumerable<Owner> GetOwners();
 
         string CreateOwner(string email, string password, string name, string? description);
 

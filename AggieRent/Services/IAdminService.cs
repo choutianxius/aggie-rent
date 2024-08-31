@@ -6,7 +6,7 @@ namespace AggieRent.Services
     {
         Admin? GetAdminById(string id);
 
-        IEnumerable<Admin> GetAdmins(string id);
+        IEnumerable<Admin> GetAdmins();
 
         string CreateAdmin(string email, string password);
 
