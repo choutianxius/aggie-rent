@@ -37,7 +37,21 @@ public class OwnerService(IOwnerRepository ownerRepository) : IOwnerService
         _ownerRepository.Remove(owner);
     }
 
-    public void UpdateOwner(string id, string? name, string? description) { }
+    public void UpdateOwner(string id, string? name, string? description)
+    {
+        var owner = _ownerRepository.Get(id) ?? throw new ArgumentException("Owner ID not found");
+        if (name != null)
+        {
+            if (name.Equals(""))
+                throw new ArgumentException("Name cannot be empty");
+            owner.Name = name;
+        }
+        if (description != null)
+        {
+            owner.Description = description;
+        }
+        _ownerRepository.Update(owner);
+    }
 
     public void ResetOwnerEmail(string id, string newEmail)
     {
