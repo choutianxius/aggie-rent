@@ -15,7 +15,7 @@ namespace AggieRent.Services
             string password,
             string firstName,
             string lastName,
-            Gender gender,
+            Gender? gender,
             DateOnly? birthday,
             string? description
         );
