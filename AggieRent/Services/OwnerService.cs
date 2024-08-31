@@ -37,11 +37,15 @@ public class OwnerService(IOwnerRepository ownerRepository) : IOwnerService
         _ownerRepository.Remove(owner);
     }
 
-    public void UpdateOwner(
-        string id,
-        string? email,
-        string? password,
-        string? name,
-        string? description
-    ) { }
+    public void UpdateOwner(string id, string? name, string? description) { }
+
+    public void ResetOwnerEmail(string id, string newEmail)
+    {
+        throw new NotImplementedException("ResetOwnerEmail not implemented");
+    }
+
+    public void ResetOwnerPassword(string id, string newPassword)
+    {
+        throw new NotImplementedException("ResetOwnerPasswor not implemented");
+    }
 }
