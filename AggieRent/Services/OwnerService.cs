@@ -13,7 +13,7 @@ public class OwnerService(IOwnerRepository ownerRepository) : IOwnerService
 
     public IEnumerable<Owner> GetOwners()
     {
-        return _ownerRepository.GetAll();
+        return _ownerRepository.GetAll().ToList();
     }
 
     public string CreateOwner(string email, string password, string name, string? description)
