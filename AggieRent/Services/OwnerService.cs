@@ -8,7 +8,7 @@ public class OwnerService(IOwnerRepository ownerRepository) : IOwnerService
 
     public Owner? GetOwnerById(string id)
     {
-        return _ownerRepository.Get(id);
+        return _ownerRepository.GetVerbose(id);
     }
 
     public IEnumerable<Owner> GetOwners()
