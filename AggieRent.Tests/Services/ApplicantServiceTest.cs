@@ -25,7 +25,7 @@ namespace AggieRent.Tests.Services
                 },
             ];
             mockApplicantRepository
-                .Setup(x => x.Get(It.IsAny<string>()))
+                .Setup(x => x.GetVerbose(It.IsAny<string>()))
                 .Returns((string id) => applicants.FirstOrDefault(a => a.Id == id));
             var applicantService = new ApplicantService(mockApplicantRepository.Object);
 
@@ -42,6 +42,24 @@ namespace AggieRent.Tests.Services
                 OccupiedApartmentId = applicants[0].OccupiedApartmentId,
             };
             Assert.Equivalent(expectedApplicant, returnedApplicant);
+            mockApplicantRepository.Verify(x => x.GetVerbose(applicants[0].Id), Times.Once());
+        }
+
+        [Fact]
+        public void GetApplicantById_UnknownId_ThenReturnNull()
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants = [];
+            mockApplicantRepository
+                .Setup(x => x.GetVerbose(It.IsAny<string>()))
+                .Returns((string id) => applicants.FirstOrDefault(a => a.Id == id));
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            var idToFind = Guid.NewGuid().ToString();
+            var returnedApplicant = applicantService.GetApplicantById(idToFind);
+
+            Assert.Null(returnedApplicant);
+            mockApplicantRepository.Verify(x => x.GetVerbose(idToFind), Times.Once());
         }
     }
 }
