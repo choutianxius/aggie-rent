@@ -62,4 +62,31 @@ namespace AggieRent.Tests.Services
             mockApplicantRepository.Verify(x => x.GetVerbose(idToFind), Times.Once());
         }
     }
+
+    public class ApplicantService_GetApplicantsShould
+    {
+        [Fact]
+        public void GetApplicants_ThenOk()
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                },
+            ];
+            mockApplicantRepository.Setup(x => x.GetAll()).Returns(applicants.AsQueryable());
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            var returnedApplicants = applicantService.GetApplicants();
+            var expectedApplicants = new List<Applicant>(applicants);
+            Assert.Equivalent(expectedApplicants, returnedApplicants);
+            mockApplicantRepository.Verify(x => x.GetAll(), Times.Once());
+        }
+    }
 }
