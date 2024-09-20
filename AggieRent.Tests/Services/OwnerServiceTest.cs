@@ -9,7 +9,7 @@ namespace AggieRent.Tests.Services
     public class OwnerService_GetOwnerByIdShould
     {
         [Fact]
-        public void GetApplicantById_ValidId_ThenReturnRelatedUser()
+        public void GetOwnerById_ValidId_ThenReturnRelatedUser()
         {
             var mockOwnerRepository = new Mock<IOwnerRepository>();
             List<Owner> owners =
