@@ -37,17 +37,77 @@ namespace AggieRent.Tests.Services
             };
             Assert.Equivalent(expectedOwner, returnedOwner);
         }
+
+        [Fact]
+        public void GetOwnerById_InvalidId_ThenArgumentException() { }
     }
 
-    public class OwnerService_GetOwnersShould { }
+    public class OwnerService_GetOwnersShould
+    {
+        [Fact]
+        public void GetOwners_ThenReturnAllOwners() { }
+    }
 
-    public class OwnerService_CreateOwnerShould { }
+    public class OwnerService_CreateOwnerShould
+    {
+        [Fact]
+        public void CreateOwner_ValidCredentials_ThenStoreOwner() { }
 
-    public class OwnerService_DeleteOwnerShould { }
+        [Fact]
+        public void CreateOwner_DuplicateEmail_ThenArgumentException() { }
 
-    public class OwnerService_UpdateOwnerShould { }
+        [Fact]
+        public void CreateOwner_InvalidEmailFormat_ThenArgumentException() { }
 
-    public class OwnerService_ResetOwnerPasswordShould { }
+        [Fact]
+        public void CreateOwner_WeakPassword_ThenArgumentException() { }
+    }
 
-    public class OwnerService_ResetOwnerEmailShould { }
+    public class OwnerService_DeleteOwnerShould
+    {
+        [Fact]
+        public void DeleteOwner_ValidId_ThenDeleteOwner() { }
+
+        [Fact]
+        public void DeleteOwner_InvalidId_ThenArgmentException() { }
+    }
+
+    public class OwnerService_UpdateOwnerShould
+    {
+        [Fact]
+        public void UpdateOwner_InvalidId_ThenArgumentException() { }
+
+        [Fact]
+        public void UpdateOwner_EmptyName_ThenArgumentException() { }
+
+        [Fact]
+        public void UpdateOwner_GoodInput_ThenUpdate() { }
+    }
+
+    public class OwnerService_ResetOwnerPasswordShould
+    {
+        [Fact]
+        public void ResetOwnerPassword_InvalidId_ThenArgumentException() { }
+
+        [Fact]
+        public void ResetOwnerPassword_InvalidEPassword_ThenArgumentException() { }
+
+        [Fact]
+        public void ResetOwnerPassword_GoodInput_ThenUpdateOwnerPassword() { }
+    }
+
+    public class OwnerService_ResetOwnerEmailShould
+    {
+        [Fact]
+        public void ResetOwnerEmail_InvalidId_ThenArgumentException() { }
+
+        [Fact]
+        public void ResetOwnerEmail_InvalidEmailFormat_ThenArgumentException() { }
+
+        [Fact]
+        public void ResetOwnerEmail_DuplicateEmail_ThenArgumentException() { }
+
+        [Fact]
+        public void ResetOwnerEmail_GoodInput_ThenUpdateOwnerEmail() { }
+    }
 }
