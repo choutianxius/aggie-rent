@@ -1,6 +1,8 @@
 using AggieRent.DataAccess;
 using AggieRent.Models;
 using AggieRent.Services;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Moq;
 using Xunit;
 
@@ -23,7 +25,7 @@ namespace AggieRent.Tests.Services
                 },
             ];
             mockOwnerRepository
-                .Setup(x => x.Get(It.IsAny<string>()))
+                .Setup(x => x.GetVerbose(It.IsAny<string>()))
                 .Returns((string id) => owners.FirstOrDefault(a => a.Id == id));
             var ownerService = new OwnerService(mockOwnerRepository.Object);
 
@@ -39,13 +41,52 @@ namespace AggieRent.Tests.Services
         }
 
         [Fact]
-        public void GetOwnerById_InvalidId_ThenArgumentException() { }
+        public void GetOwnerById_InvalidId_ThenReturnNull()
+        {
+            var testId = Guid.NewGuid().ToString();
+            var mockOwnerRepository = new Mock<IOwnerRepository>();
+            List<Owner> owners =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "owner@niceestate.com",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    Name = "Nice estate",
+                },
+            ];
+            mockOwnerRepository
+                .Setup(x => x.GetVerbose(It.IsAny<string>()))
+                .Returns((string id) => owners.FirstOrDefault(a => a.Id == id));
+            var ownerService = new OwnerService(mockOwnerRepository.Object);
+            var returnedOwner = ownerService.GetOwnerById(testId);
+
+            Assert.Null(returnedOwner);
+        }
     }
 
     public class OwnerService_GetOwnersShould
     {
         [Fact]
-        public void GetOwners_ThenReturnAllOwners() { }
+        public void GetOwners_ThenReturnAllOwners()
+        {
+            var mockOwnerRepository = new Mock<IOwnerRepository>();
+            List<Owner> owners =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "owner@niceestate.com",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    Name = "Nice estate",
+                },
+            ];
+            List<Owner> wrong = [];
+            mockOwnerRepository.Setup(x => x.GetAll()).Returns(owners.AsQueryable());
+            var ownerService = new OwnerService(mockOwnerRepository.Object);
+            var returnedOwners = ownerService.GetOwners();
+            Assert.Equivalent(owners, returnedOwners);
+        }
     }
 
     public class OwnerService_CreateOwnerShould
