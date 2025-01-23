@@ -7,7 +7,6 @@ using AggieRent.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using Npgsql.TypeMapping;
 using Xunit;
 
 namespace AggieRent.Tests.Controllers
@@ -90,7 +89,7 @@ namespace AggieRent.Tests.Controllers
         [InlineData("applicant@tamu.edu", AuthController.UserType.Applicant)]
         [InlineData("owner@tamu.edu", AuthController.UserType.Owner)]
         [InlineData("admin@tamu.edu", AuthController.UserType.Admin)]
-        public async void Login_GoodInput_Then200OkWithUserSignedIn(
+        public async Task Login_GoodInput_Then200OkWithUserSignedIn(
             string email,
             AuthController.UserType userType
         )
@@ -188,7 +187,7 @@ namespace AggieRent.Tests.Controllers
         [InlineData(AuthController.UserType.Applicant)]
         [InlineData(AuthController.UserType.Owner)]
         [InlineData(AuthController.UserType.Admin)]
-        public async void Login_AuthServiceArgumentException_ThenBadRequestWithMessage(
+        public async Task Login_AuthServiceArgumentException_ThenBadRequestWithMessage(
             AuthController.UserType userType
         )
         {
@@ -221,7 +220,7 @@ namespace AggieRent.Tests.Controllers
     public class AuthController_LogoutShould
     {
         [Fact]
-        public async void Logout_Then200Ok()
+        public async Task Logout_Then200Ok()
         {
             var mockAuthService = new Mock<IAuthService>();
             // Arrange authentication service, which is implicitly required by the SignInAsync method
