@@ -1,7 +1,6 @@
 using AggieRent.DataAccess;
 using AggieRent.Models;
 using AggieRent.Services;
-using Microsoft.AspNetCore.Mvc;
 using Moq;
 using Xunit;
 
@@ -149,5 +148,69 @@ namespace AggieRent.Tests.Services
             Assert.Equivalent(new DateOnly(2000, 1, 1), createdApplicant.Birthday);
             Assert.Equal(description, createdApplicant.Description);
         }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("abc")]
+        [InlineData("aggie@")]
+        [InlineData("@tamu.edu")]
+        [InlineData("admin@[127.0.0.1")]
+        public void CreateApplicant_InvalidEmail_ThenArgumentException(String badEmail)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() =>
+                applicantService.CreateApplicant(
+                    badEmail,
+                    "superStr0ngP@ssw0rd",
+                    "John",
+                    "Doe",
+                    null,
+                    null,
+                    null
+                );
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Invalid email format!", ae.Message);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("aB1_")]
+        [InlineData("abcdefgh")]
+        [InlineData("a1b2c3d4")]
+        [InlineData("a1b2c3d_")]
+        [InlineData("superstrongp@ssw0rd")]
+        [InlineData("SUPERSTRONGP@SSW0RD")]
+        [InlineData("SuperStrongPassw0rd")]
+        [InlineData("SuperStrongP@ssword")]
+        [InlineData("Emoj1S_n0T_All0w3d🥲")]
+        public void CreateApplicant_InvalidPassword_ThenArgumentException(String badPassword)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() =>
+                applicantService.CreateApplicant(
+                    "aggie@tamu.edu",
+                    badPassword,
+                    "John",
+                    "Doe",
+                    null,
+                    null,
+                    null
+                );
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal(
+                "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number",
+                ae.Message
+            );
+        }
+
+        // TODO: Duplicate email
+        // TODO: Empty first name
+        // TODO: Empty last name
     }
 }
