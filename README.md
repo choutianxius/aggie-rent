@@ -1,6 +1,6 @@
-# AggieRent
-
 ![ci status](https://github.com/choutianxius/aggie-rent/actions/workflows/test_and_format.yml/badge.svg)
+
+# AggieRent
 
 A .NET Core project helping Aggies find their dream home!
 
