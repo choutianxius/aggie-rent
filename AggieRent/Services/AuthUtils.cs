@@ -7,7 +7,9 @@ namespace AggieRent.Services
 {
     public partial class AuthUtils
     {
-        [GeneratedRegex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$")]
+        [GeneratedRegex(
+            @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+])[A-Za-z\d~!@#$%^&*()_+]{8,}$"
+        )]
         private static partial Regex PasswordRegex();
 
         private static readonly Regex passwordRegex = PasswordRegex();
