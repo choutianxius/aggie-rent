@@ -155,7 +155,7 @@ namespace AggieRent.Tests.Services
         [InlineData("aggie@")]
         [InlineData("@tamu.edu")]
         [InlineData("admin@[127.0.0.1")]
-        public void CreateApplicant_InvalidEmail_ThenArgumentException(String badEmail)
+        public void CreateApplicant_InvalidEmail_ThenArgumentException(string badEmail)
         {
             var mockApplicantRepository = new Mock<IApplicantRepository>();
             var applicantService = new ApplicantService(mockApplicantRepository.Object);
@@ -186,7 +186,7 @@ namespace AggieRent.Tests.Services
         [InlineData("SuperStrongPassw0rd")]
         [InlineData("SuperStrongP@ssword")]
         [InlineData("Emoj1S_n0T_All0w3d🥲")]
-        public void CreateApplicant_InvalidPassword_ThenArgumentException(String badPassword)
+        public void CreateApplicant_InvalidPassword_ThenArgumentException(string badPassword)
         {
             var mockApplicantRepository = new Mock<IApplicantRepository>();
             var applicantService = new ApplicantService(mockApplicantRepository.Object);
@@ -209,8 +209,122 @@ namespace AggieRent.Tests.Services
             );
         }
 
-        // TODO: Duplicate email
-        // TODO: Empty first name
-        // TODO: Empty last name
+        [Theory]
+        [InlineData("Aggie@tamu.edu")]
+        [InlineData("aggIe@TAMU.EDU")]
+        public void CreateApplicant_DuplicateEmail_ThenArgumentException(string badEmail)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                },
+            ];
+            mockApplicantRepository.Setup(x => x.GetAll()).Returns(applicants.AsQueryable());
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() =>
+                applicantService.CreateApplicant(
+                    badEmail,
+                    "superStr0ngP@ssw0rd",
+                    "John",
+                    "Deer",
+                    null,
+                    null,
+                    null
+                );
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Email already in use!", ae.Message);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("\t")]
+        [InlineData("\n")]
+        [InlineData("\r")]
+        public void CreateApplicant_EmptyFirstName_ThenArgumentException(string emptyFirstName)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() =>
+                applicantService.CreateApplicant(
+                    "aggie@tamu.edu",
+                    "superStr0ngP@ssw0rd",
+                    emptyFirstName,
+                    "Doe",
+                    null,
+                    null,
+                    null
+                );
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("First name cannot be empty!", ae.Message);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData(" ")]
+        [InlineData("\t")]
+        [InlineData("\n")]
+        [InlineData("\r")]
+        public void CreateApplicant_EmptyLastName_ThenArgumentException(string emptyLastName)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() =>
+                applicantService.CreateApplicant(
+                    "aggie@tamu.edu",
+                    "superStr0ngP@ssw0rd",
+                    "John",
+                    emptyLastName,
+                    null,
+                    null,
+                    null
+                );
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Last name cannot be empty!", ae.Message);
+        }
+
+        [Fact]
+        public void CreateApplicant_NullGender_ThenDefaultValue()
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants = [];
+            mockApplicantRepository
+                .Setup(x => x.Add(It.IsAny<Applicant>()))
+                .Callback(
+                    (Applicant a) =>
+                    {
+                        if (applicants.FirstOrDefault(a1 => a1.Id == a.Id) != null)
+                            throw new Exception("Duplicate ID");
+                        applicants.Add(a);
+                    }
+                );
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            applicantService.CreateApplicant(
+                "aggie@tamu.edu",
+                "veryStr0ngP@ssw0Rd",
+                "John",
+                "Doe",
+                null,
+                null,
+                null
+            );
+
+            Assert.Single(applicants);
+            Assert.Equal(Gender.NotSet, applicants[0].Gender);
+        }
     }
 }
