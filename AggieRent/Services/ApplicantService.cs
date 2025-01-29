@@ -28,9 +28,9 @@ namespace AggieRent.Services
         )
         {
             if (string.IsNullOrWhiteSpace(firstName))
-                throw new ArgumentException("First name cannot be empty!");
+                throw new ArgumentException("First name cannot be empty");
             if (string.IsNullOrWhiteSpace(lastName))
-                throw new ArgumentException("Last name cannot be empty!");
+                throw new ArgumentException("Last name cannot be empty");
 
             AuthUtils.ValidateRegistrationCredentials(email, password, _applicantRepository);
             var id = Guid.NewGuid().ToString();

@@ -102,7 +102,7 @@ namespace AggieRent.Tests.Services
 
             // Assert
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Invalid email format!", ae.Message);
+            Assert.Equal("Invalid email format", ae.Message);
         }
 
         [Theory]
@@ -156,7 +156,7 @@ namespace AggieRent.Tests.Services
 
             // Assert
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Email already in use!", ae.Message);
+            Assert.Equal("Email already in use", ae.Message);
         }
 
         [Theory]
@@ -328,7 +328,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginApplicant(testEmail, testPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Email not registered!", ae.Message);
+            Assert.Equal("Email not registered", ae.Message);
         }
 
         [Fact]
@@ -368,7 +368,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginApplicant(testEmail, "someR@nd0mp@ssw0rd");
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Wrong password!", ae.Message);
+            Assert.Equal("Wrong password", ae.Message);
         }
     }
 
@@ -429,7 +429,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginOwner(testEmail, testPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Email not registered!", ae.Message);
+            Assert.Equal("Email not registered", ae.Message);
         }
 
         [Fact]
@@ -463,7 +463,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginOwner(testEmail, wrongPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Wrong password!", ae.Message);
+            Assert.Equal("Wrong password", ae.Message);
         }
     }
 
@@ -520,7 +520,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginAdmin(testEmail, testPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Email not registered!", ae.Message);
+            Assert.Equal("Email not registered", ae.Message);
         }
 
         [Fact]
@@ -550,7 +550,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginAdmin(testEmail, wrongPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Wrong password!", ae.Message);
+            Assert.Equal("Wrong password", ae.Message);
         }
     }
 }
