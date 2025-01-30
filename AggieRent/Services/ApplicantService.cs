@@ -64,14 +64,14 @@ namespace AggieRent.Services
 
             if (firstName != null)
             {
-                if (firstName.Equals(""))
+                if (string.IsNullOrWhiteSpace(firstName))
                     throw new ArgumentException("First name cannot be empty");
                 applicant.FirstName = firstName;
             }
 
             if (lastName != null)
             {
-                if (lastName.Equals(""))
+                if (string.IsNullOrWhiteSpace(lastName))
                     throw new ArgumentException("Last name cannot be empty");
                 applicant.LastName = lastName;
             }
