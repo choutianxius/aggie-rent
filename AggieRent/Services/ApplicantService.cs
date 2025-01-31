@@ -100,13 +100,13 @@ namespace AggieRent.Services
             var normalizedEmail = AuthUtils.NormalizeEmail(newEmail);
 
             if (normalizedEmail.Equals(applicant.Email))
-                return;
+                throw new ArgumentException("Email is not modified");
 
             var existingApplicant = _applicantRepository
                 .GetAll()
                 .FirstOrDefault(a => a.Email == normalizedEmail);
             if (existingApplicant != null)
-                throw new ArgumentException("Email already in use");
+                throw new ArgumentException("Email is already used by another account");
 
             applicant.Email = normalizedEmail;
             _applicantRepository.Update(applicant);

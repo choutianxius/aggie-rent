@@ -93,8 +93,10 @@ namespace AggieRent.Tests.Services
 
     public class ApplicantService_CreateApplicantShould
     {
-        [Fact]
-        public void CreateApplicant_GoodInput_ThenAddApplicantAndReturnId()
+        [Theory]
+        [InlineData("aggie1@tamu.edu")]
+        [InlineData("AggiE1@tAmu.edu")]
+        public void CreateApplicant_GoodInput_ThenAddApplicantAndReturnId(string email)
         {
             var mockApplicantRepository = new Mock<IApplicantRepository>();
             List<Applicant> applicants =
@@ -121,7 +123,6 @@ namespace AggieRent.Tests.Services
                 );
             var applicantService = new ApplicantService(mockApplicantRepository.Object);
 
-            var email = "aggie1@tamu.edu";
             var password = "superStr0ngp@ssw0rd";
             var firstName = "John";
             var lastName = "Deer";
@@ -141,7 +142,7 @@ namespace AggieRent.Tests.Services
             Assert.Equal(2, applicants.Count);
             var createdApplicant = applicants.FirstOrDefault(a => a.Id == id);
             Assert.NotNull(createdApplicant);
-            Assert.Equal(email, createdApplicant.Email);
+            Assert.Equal(AuthUtils.NormalizeEmail(email), createdApplicant.Email);
             Assert.True(BC.Verify(password, createdApplicant.HashedPassword));
             Assert.Equal(firstName, createdApplicant.FirstName);
             Assert.Equal(lastName, createdApplicant.LastName);
@@ -561,6 +562,236 @@ namespace AggieRent.Tests.Services
             Assert.Empty(applicants[0].WishedApartments);
             Assert.Null(applicants[0].OccupiedApartmentId);
             Assert.Null(applicants[0].OccupiedApartment);
+        }
+    }
+
+    public class ApplicantService_ResetApplicantEmailShould
+    {
+        [Theory]
+        [InlineData("aggie1@tamu.edu")]
+        [InlineData("Aggie1@tamu.edu")]
+        public void ResetApplicantEmail_GoodInput_ThenUpdateToNormalizedEmail(string updatedEmail)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Gender = Gender.Female,
+                    Birthday = new DateOnly(2000, 1, 1),
+                    Description = "Hi, I'm John Doe",
+                },
+            ];
+            mockApplicantRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault((applicant) => applicant.Id.Equals(id))
+                );
+            mockApplicantRepository.Setup((x) => x.GetAll()).Returns(applicants.AsQueryable());
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            applicantService.ResetApplicantEmail(applicants[0].Id, updatedEmail);
+
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.GetAll(), Times.Once);
+            Assert.Single(applicants);
+            Assert.Equal(AuthUtils.NormalizeEmail(updatedEmail), applicants[0].Email);
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.Equal("John", applicants[0].FirstName);
+            Assert.Equal("Doe", applicants[0].LastName);
+            Assert.Equal(Gender.Female, applicants[0].Gender);
+            Assert.Equal(new DateOnly(2000, 1, 1), applicants[0].Birthday);
+            Assert.Equal("Hi, I'm John Doe", applicants[0].Description);
+            Assert.Empty(applicants[0].AppliedApartments);
+            Assert.Empty(applicants[0].WishedApartments);
+            Assert.Null(applicants[0].OccupiedApartmentId);
+            Assert.Null(applicants[0].OccupiedApartment);
+        }
+
+        [Theory]
+        [InlineData("aggie@tamu.edu")]
+        [InlineData("Aggie@tAmu.edu")]
+        public void ResetApplicantEmail_SameEmail_ThenArgumentException(string updatedEmail)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Gender = Gender.Female,
+                    Birthday = new DateOnly(2000, 1, 1),
+                    Description = "Hi, I'm John Doe",
+                },
+            ];
+            mockApplicantRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault((applicant) => applicant.Id.Equals(id))
+                );
+            mockApplicantRepository.Setup((x) => x.GetAll()).Returns(applicants.AsQueryable());
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() => applicantService.ResetApplicantEmail(applicants[0].Id, updatedEmail);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Email is not modified", ae.Message);
+        }
+
+        [Theory]
+        [InlineData("aggie1@tamu.edu")]
+        [InlineData("Aggie1@tAmu.edu")]
+        public void ResetApplicantEmail_EmailInUse_ThenArgumentException(string updatedEmail)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Gender = Gender.Female,
+                    Birthday = new DateOnly(2000, 1, 1),
+                    Description = "Hi, I'm John Doe",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie1@tamu.edu",
+                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Deer",
+                    Gender = Gender.Male,
+                    Birthday = new DateOnly(2000, 1, 2),
+                    Description = "Hi, I'm John Deer",
+                },
+            ];
+            mockApplicantRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault((applicant) => applicant.Id.Equals(id))
+                );
+            mockApplicantRepository.Setup((x) => x.GetAll()).Returns(applicants.AsQueryable());
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() => applicantService.ResetApplicantEmail(applicants[0].Id, updatedEmail);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Email is already used by another account", ae.Message);
+
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.GetAll(), Times.Once);
+
+            Assert.Equal("aggie@tamu.edu", applicants[0].Email);
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.Equal("John", applicants[0].FirstName);
+            Assert.Equal("Doe", applicants[0].LastName);
+            Assert.Equal(Gender.Female, applicants[0].Gender);
+            Assert.Equal(new DateOnly(2000, 1, 1), applicants[0].Birthday);
+            Assert.Equal("Hi, I'm John Doe", applicants[0].Description);
+            Assert.Empty(applicants[0].AppliedApartments);
+            Assert.Empty(applicants[0].WishedApartments);
+            Assert.Null(applicants[0].OccupiedApartmentId);
+            Assert.Null(applicants[0].OccupiedApartment);
+
+            Assert.Equal("aggie1@tamu.edu", applicants[1].Email);
+            Assert.True(BC.Verify("superStr0ngP@ssw0rd", applicants[1].HashedPassword));
+            Assert.Equal("John", applicants[1].FirstName);
+            Assert.Equal("Deer", applicants[1].LastName);
+            Assert.Equal(Gender.Male, applicants[1].Gender);
+            Assert.Equal(new DateOnly(2000, 1, 2), applicants[1].Birthday);
+            Assert.Equal("Hi, I'm John Deer", applicants[1].Description);
+            Assert.Empty(applicants[1].AppliedApartments);
+            Assert.Empty(applicants[1].WishedApartments);
+            Assert.Null(applicants[1].OccupiedApartmentId);
+            Assert.Null(applicants[1].OccupiedApartment);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("abc")]
+        [InlineData("aggie@")]
+        [InlineData("@tamu.edu")]
+        [InlineData("admin@[127.0.0.1")]
+        public void ResetApplicantEmail_BadEmailFormat_ThenArgumentException(string badEmail)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Gender = Gender.Female,
+                    Birthday = new DateOnly(2000, 1, 1),
+                    Description = "Hi, I'm John Doe",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie1@tamu.edu",
+                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Deer",
+                    Gender = Gender.Male,
+                    Birthday = new DateOnly(2000, 1, 2),
+                    Description = "Hi, I'm John Deer",
+                },
+            ];
+            mockApplicantRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault((applicant) => applicant.Id.Equals(id))
+                );
+            mockApplicantRepository.Setup((x) => x.GetAll()).Returns(applicants.AsQueryable());
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() => applicantService.ResetApplicantEmail(applicants[0].Id, badEmail);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Invalid email format", ae.Message);
+
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.GetAll(), Times.Never);
+
+            Assert.Equal("aggie@tamu.edu", applicants[0].Email);
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.Equal("John", applicants[0].FirstName);
+            Assert.Equal("Doe", applicants[0].LastName);
+            Assert.Equal(Gender.Female, applicants[0].Gender);
+            Assert.Equal(new DateOnly(2000, 1, 1), applicants[0].Birthday);
+            Assert.Equal("Hi, I'm John Doe", applicants[0].Description);
+            Assert.Empty(applicants[0].AppliedApartments);
+            Assert.Empty(applicants[0].WishedApartments);
+            Assert.Null(applicants[0].OccupiedApartmentId);
+            Assert.Null(applicants[0].OccupiedApartment);
+
+            Assert.Equal("aggie1@tamu.edu", applicants[1].Email);
+            Assert.True(BC.Verify("superStr0ngP@ssw0rd", applicants[1].HashedPassword));
+            Assert.Equal("John", applicants[1].FirstName);
+            Assert.Equal("Deer", applicants[1].LastName);
+            Assert.Equal(Gender.Male, applicants[1].Gender);
+            Assert.Equal(new DateOnly(2000, 1, 2), applicants[1].Birthday);
+            Assert.Equal("Hi, I'm John Deer", applicants[1].Description);
+            Assert.Empty(applicants[1].AppliedApartments);
+            Assert.Empty(applicants[1].WishedApartments);
+            Assert.Null(applicants[1].OccupiedApartmentId);
+            Assert.Null(applicants[1].OccupiedApartment);
         }
     }
 }
