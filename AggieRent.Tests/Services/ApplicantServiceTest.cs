@@ -922,7 +922,7 @@ namespace AggieRent.Tests.Services
                 ae.Message
             );
             Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
-            mockApplicantRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Never);
+            mockApplicantRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Once);
         }
     }
 }

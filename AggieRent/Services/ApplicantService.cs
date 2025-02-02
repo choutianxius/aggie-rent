@@ -114,14 +114,14 @@ namespace AggieRent.Services
 
         public void ResetApplicantPassword(string id, string newPassword)
         {
+            var applicant =
+                _applicantRepository.Get(id)
+                ?? throw new ArgumentException("Applicant ID not found");
+
             if (!AuthUtils.ValidatePassword(newPassword))
                 throw new ArgumentException(
                     "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number"
                 );
-
-            var applicant =
-                _applicantRepository.Get(id)
-                ?? throw new ArgumentException("Applicant ID not found");
 
             applicant.HashedPassword = BC.HashPassword(newPassword);
             _applicantRepository.Update(applicant);
