@@ -372,6 +372,7 @@ namespace AggieRent.Tests.Services
             );
 
             mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once());
+            mockApplicantRepository.Verify((x) => x.Update(applicants[0]), Times.Once);
 
             Assert.Equal("Johny", applicants[0].FirstName);
             Assert.Equal("Doey", applicants[0].LastName);
@@ -438,6 +439,8 @@ namespace AggieRent.Tests.Services
 
             var ae = Assert.Throws<ArgumentException>(action);
             Assert.Equal("Applicant ID not found", ae.Message);
+            mockApplicantRepository.Verify((x) => x.Get("abcd123456"), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
 
         [Theory]
@@ -479,6 +482,8 @@ namespace AggieRent.Tests.Services
                 );
             var ae = Assert.Throws<ArgumentException>(action);
             Assert.Equal("First name cannot be empty", ae.Message);
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
 
         [Theory]
@@ -520,6 +525,8 @@ namespace AggieRent.Tests.Services
                 );
             var ae = Assert.Throws<ArgumentException>(action);
             Assert.Equal("Last name cannot be empty", ae.Message);
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
 
         [Fact]
@@ -562,6 +569,8 @@ namespace AggieRent.Tests.Services
             Assert.Empty(applicants[0].WishedApartments);
             Assert.Null(applicants[0].OccupiedApartmentId);
             Assert.Null(applicants[0].OccupiedApartment);
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(applicants[0]), Times.Once);
         }
     }
 
@@ -611,6 +620,8 @@ namespace AggieRent.Tests.Services
             Assert.Empty(applicants[0].WishedApartments);
             Assert.Null(applicants[0].OccupiedApartmentId);
             Assert.Null(applicants[0].OccupiedApartment);
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(applicants[0]), Times.Once);
         }
 
         [Theory]
@@ -645,6 +656,8 @@ namespace AggieRent.Tests.Services
 
             var ae = Assert.Throws<ArgumentException>(action);
             Assert.Equal("Email is not modified", ae.Message);
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
 
         [Theory]
@@ -717,6 +730,10 @@ namespace AggieRent.Tests.Services
             Assert.Empty(applicants[1].WishedApartments);
             Assert.Null(applicants[1].OccupiedApartmentId);
             Assert.Null(applicants[1].OccupiedApartment);
+
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.GetAll(), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
 
         [Theory]
@@ -792,6 +809,9 @@ namespace AggieRent.Tests.Services
             Assert.Empty(applicants[1].WishedApartments);
             Assert.Null(applicants[1].OccupiedApartmentId);
             Assert.Null(applicants[1].OccupiedApartment);
+
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
     }
 
@@ -839,6 +859,7 @@ namespace AggieRent.Tests.Services
             Assert.Null(applicants[0].OccupiedApartmentId);
             Assert.Null(applicants[0].OccupiedApartment);
             mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(applicants[0]), Times.Once);
         }
 
         [Fact]
@@ -873,6 +894,7 @@ namespace AggieRent.Tests.Services
             var ae = Assert.Throws<ArgumentException>(action);
             Assert.Equal("Applicant ID not found", ae.Message);
             mockApplicantRepository.Verify((x) => x.Get("abcdefg"), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
 
         [Theory]
@@ -923,6 +945,7 @@ namespace AggieRent.Tests.Services
             );
             Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
             mockApplicantRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
     }
 
