@@ -131,7 +131,7 @@ namespace AggieRent.Services
         {
             var applicant =
                 _applicantRepository.Get(id)
-                ?? throw new ArgumentException("User ID doesn't exist");
+                ?? throw new ArgumentException("Applicant ID not found");
             _applicantRepository.Remove(applicant);
         }
     }

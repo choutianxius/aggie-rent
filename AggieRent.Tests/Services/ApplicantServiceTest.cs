@@ -925,4 +925,97 @@ namespace AggieRent.Tests.Services
             mockApplicantRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Once);
         }
     }
+
+    public class ApplicantService_DeleteApplicantShould
+    {
+        [Fact]
+        public void DeleteApplicant_ExistingApplicantId_ThenDelete()
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie1@tamu.edu",
+                    HashedPassword = BC.HashPassword("verySt0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie2@tamu.edu",
+                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Deer",
+                },
+            ];
+            mockApplicantRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault((applicant) => applicant.Id.Equals(id))
+                );
+            mockApplicantRepository
+                .Setup((x) => x.Remove(It.IsAny<Applicant>()))
+                .Callback(
+                    (Applicant applicant) =>
+                    {
+                        bool removed = applicants.Remove(applicant);
+                        if (!removed)
+                            throw new ArgumentException("Applicant not found");
+                    }
+                );
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+            var applicant1 = applicants[0];
+            var applicant2Id = applicants[1].Id;
+
+            applicantService.DeleteApplicant(applicants[0].Id);
+            Assert.Single(applicants);
+            Assert.Equal(applicant2Id, applicants[0].Id);
+            Assert.Equal("aggie2@tamu.edu", applicants[0].Email);
+            Assert.True(BC.Verify("superStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.Equal("John", applicants[0].FirstName);
+            Assert.Equal("Deer", applicants[0].LastName);
+            Assert.Equal(Gender.NotSet, applicants[0].Gender);
+            Assert.Null(applicants[0].Birthday);
+            Assert.Null(applicants[0].Description);
+            Assert.Empty(applicants[0].AppliedApartments);
+            Assert.Empty(applicants[0].WishedApartments);
+            Assert.Null(applicants[0].OccupiedApartmentId);
+            Assert.Null(applicants[0].OccupiedApartment);
+            mockApplicantRepository.Verify((x) => x.Get(applicant1.Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Remove(applicant1), Times.Once);
+        }
+
+        [Fact]
+        public void DeleteApplicant_NonExistentId_ThenArgumentException()
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie1@tamu.edu",
+                    HashedPassword = BC.HashPassword("verySt0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                },
+            ];
+            mockApplicantRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault((applicant) => applicant.Id.Equals(id))
+                );
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() => applicantService.DeleteApplicant("abcd");
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Applicant ID not found", ae.Message);
+            mockApplicantRepository.Verify((x) => x.Get("abcd"), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Remove(It.IsAny<Applicant>()), Times.Never);
+        }
+    }
 }
