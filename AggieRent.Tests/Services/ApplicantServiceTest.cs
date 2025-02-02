@@ -794,4 +794,135 @@ namespace AggieRent.Tests.Services
             Assert.Null(applicants[1].OccupiedApartment);
         }
     }
+
+    public class ApplicantService_ResetApplicantPasswordShould
+    {
+        [Fact]
+        public void ResetApplicantPassword_GoodInput_ThenResetPassword()
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Gender = Gender.Female,
+                    Birthday = new DateOnly(2000, 1, 1),
+                    Description = "Hi, I'm John Doe",
+                },
+            ];
+            mockApplicantRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault((applicant) => applicant.Id.Equals(id))
+                );
+            mockApplicantRepository.Setup((x) => x.GetAll()).Returns(applicants.AsQueryable());
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            applicantService.ResetApplicantPassword(applicants[0].Id, "superStr0ngP@ssw0rd");
+
+            Assert.Single(applicants);
+            Assert.True(BC.Verify("superStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.False(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.Equal("aggie@tamu.edu", applicants[0].Email);
+            Assert.Equal("John", applicants[0].FirstName);
+            Assert.Equal("Doe", applicants[0].LastName);
+            Assert.Equal(Gender.Female, applicants[0].Gender);
+            Assert.Equal(new DateOnly(2000, 1, 1), applicants[0].Birthday);
+            Assert.Equal("Hi, I'm John Doe", applicants[0].Description);
+            Assert.Empty(applicants[0].AppliedApartments);
+            Assert.Empty(applicants[0].WishedApartments);
+            Assert.Null(applicants[0].OccupiedApartmentId);
+            Assert.Null(applicants[0].OccupiedApartment);
+            mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+        }
+
+        [Fact]
+        public void ResetApplicantPassword_IdNotExists_ThenArgumentException()
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Gender = Gender.Female,
+                    Birthday = new DateOnly(2000, 1, 1),
+                    Description = "Hi, I'm John Doe",
+                },
+            ];
+            mockApplicantRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault((applicant) => applicant.Id.Equals(id))
+                );
+            mockApplicantRepository.Setup((x) => x.GetAll()).Returns(applicants.AsQueryable());
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() =>
+                applicantService.ResetApplicantPassword("abcdefg", "superStr0ngP@ssw0rd");
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Applicant ID not found", ae.Message);
+            mockApplicantRepository.Verify((x) => x.Get("abcdefg"), Times.Once);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("aB1_")]
+        [InlineData("abcdefgh")]
+        [InlineData("a1b2c3d4")]
+        [InlineData("a1b2c3d_")]
+        [InlineData("superstrongp@ssw0rd")]
+        [InlineData("SUPERSTRONGP@SSW0RD")]
+        [InlineData("SuperStrongPassw0rd")]
+        [InlineData("SuperStrongP@ssword")]
+        [InlineData("Emoj1S_n0T_All0w3d🥲")]
+        public void ResetApplicantPassword_InvalidPassword_ThenArgumentException(
+            string invalidPassword
+        )
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Gender = Gender.Female,
+                    Birthday = new DateOnly(2000, 1, 1),
+                    Description = "Hi, I'm John Doe",
+                },
+            ];
+            mockApplicantRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault((applicant) => applicant.Id.Equals(id))
+                );
+            mockApplicantRepository.Setup((x) => x.GetAll()).Returns(applicants.AsQueryable());
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() =>
+                applicantService.ResetApplicantPassword(applicants[0].Id, invalidPassword);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal(
+                "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number",
+                ae.Message
+            );
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            mockApplicantRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Never);
+        }
+    }
 }
