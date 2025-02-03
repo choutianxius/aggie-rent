@@ -7,7 +7,9 @@ namespace AggieRent.Services
 {
     public partial class AuthUtils
     {
-        [GeneratedRegex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$")]
+        [GeneratedRegex(
+            @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[~!@#$%^&*()_+])[A-Za-z\d~!@#$%^&*()_+]{8,}$"
+        )]
         private static partial Regex PasswordRegex();
 
         private static readonly Regex passwordRegex = PasswordRegex();
@@ -21,12 +23,12 @@ namespace AggieRent.Services
         {
             string normalizedEmail = NormalizeEmail(email);
             if (!ValidateEmail(normalizedEmail))
-                throw new ArgumentException("Invalid email format!");
+                throw new ArgumentException("Invalid email format");
 
             // Lazy execute
             var existingUser = repository.GetAll().FirstOrDefault(u => u.Email == normalizedEmail);
             if (existingUser != null)
-                throw new ArgumentException("Email already in use!");
+                throw new ArgumentException("Email already in use");
 
             if (!ValidatePassword(password))
                 throw new ArgumentException(

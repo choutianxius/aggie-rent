@@ -64,9 +64,9 @@ namespace AggieRent.Services
                 repository
                     .GetAll()
                     .FirstOrDefault(u => u.Email.Equals(AuthUtils.NormalizeEmail(email)))
-                ?? throw new ArgumentException("Email not registered!");
+                ?? throw new ArgumentException("Email not registered");
             if (!BC.Verify(password, user.HashedPassword))
-                throw new ArgumentException("Wrong password!");
+                throw new ArgumentException("Wrong password");
             return user;
         }
     }

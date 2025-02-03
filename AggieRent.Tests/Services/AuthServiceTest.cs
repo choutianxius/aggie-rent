@@ -102,7 +102,7 @@ namespace AggieRent.Tests.Services
 
             // Assert
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Invalid email format!", ae.Message);
+            Assert.Equal("Invalid email format", ae.Message);
         }
 
         [Theory]
@@ -156,7 +156,7 @@ namespace AggieRent.Tests.Services
 
             // Assert
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Email already in use!", ae.Message);
+            Assert.Equal("Email already in use", ae.Message);
         }
 
         [Theory]
@@ -209,6 +209,62 @@ namespace AggieRent.Tests.Services
                 "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number",
                 ae.Message
             );
+        }
+
+        [Theory]
+        [InlineData("P@ssw0rd0~")]
+        [InlineData("P@ssw0rd1!")]
+        [InlineData("P@ssw0rd2@")]
+        [InlineData("P@ssw0rd3#")]
+        [InlineData("P@ssw0rd4$")]
+        [InlineData("P@ssw0rd5%")]
+        [InlineData("P@ssw0rd6^")]
+        [InlineData("P@ssw0rd7&")]
+        [InlineData("P@ssw0rd8*")]
+        [InlineData("P@ssw0rd9(")]
+        [InlineData("P@ssw0rd10)")]
+        [InlineData("P@ssw0rd11_")]
+        [InlineData("P@ssw0rd12+")]
+        public void RegisterApplicant_AllowedPasswordChars_ThenOk(String password)
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            var mockOwnerRepository = new Mock<IOwnerRepository>();
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Applicant> applicants = [];
+            mockApplicantRepository.Setup(x => x.GetAll()).Returns(applicants.AsQueryable());
+            mockApplicantRepository
+                .Setup(x => x.Add(It.IsAny<Applicant>()))
+                .Callback((Applicant u) => applicants.Add(u));
+            var authService = new AuthService(
+                mockApplicantRepository.Object,
+                mockOwnerRepository.Object,
+                mockAdminRepository.Object
+            );
+
+            var testEmail = "aggie@tamu.edu";
+            var testFirstName = "John";
+            var testLastName = "Doe";
+            var testGender = Gender.Male;
+            var testBirthday = DateOnly.FromDateTime(DateTime.UtcNow);
+            var testDescription = "Hello, I'm John Doe";
+            authService.RegisterApplicant(
+                testEmail,
+                password,
+                testFirstName,
+                testLastName,
+                testGender,
+                testBirthday,
+                testDescription
+            );
+
+            Assert.Single(applicants);
+            Assert.Equal(testEmail.ToLower(), applicants[0].Email);
+            Assert.True(BC.Verify(password, applicants[0].HashedPassword));
+            Assert.Equal(testFirstName, applicants[0].FirstName);
+            Assert.Equal(testLastName, applicants[0].LastName);
+            Assert.Equal(testGender, applicants[0].Gender);
+            Assert.Equal(testBirthday, applicants[0].Birthday);
+            Assert.Equal(testDescription, applicants[0].Description);
         }
     }
 
@@ -272,7 +328,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginApplicant(testEmail, testPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Email not registered!", ae.Message);
+            Assert.Equal("Email not registered", ae.Message);
         }
 
         [Fact]
@@ -312,7 +368,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginApplicant(testEmail, "someR@nd0mp@ssw0rd");
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Wrong password!", ae.Message);
+            Assert.Equal("Wrong password", ae.Message);
         }
     }
 
@@ -373,7 +429,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginOwner(testEmail, testPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Email not registered!", ae.Message);
+            Assert.Equal("Email not registered", ae.Message);
         }
 
         [Fact]
@@ -407,7 +463,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginOwner(testEmail, wrongPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Wrong password!", ae.Message);
+            Assert.Equal("Wrong password", ae.Message);
         }
     }
 
@@ -464,7 +520,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginAdmin(testEmail, testPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Email not registered!", ae.Message);
+            Assert.Equal("Email not registered", ae.Message);
         }
 
         [Fact]
@@ -494,7 +550,7 @@ namespace AggieRent.Tests.Services
             void action() => authService.LoginAdmin(testEmail, wrongPassword);
 
             var ae = Assert.Throws<ArgumentException>(action);
-            Assert.Equal("Wrong password!", ae.Message);
+            Assert.Equal("Wrong password", ae.Message);
         }
     }
 }

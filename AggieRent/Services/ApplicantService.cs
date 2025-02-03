@@ -9,7 +9,7 @@ namespace AggieRent.Services
 
         public Applicant? GetApplicantById(string id)
         {
-            return _applicantRepository.Get(id);
+            return _applicantRepository.GetVerbose(id);
         }
 
         public IEnumerable<Applicant> GetApplicants()
@@ -27,6 +27,11 @@ namespace AggieRent.Services
             string? description
         )
         {
+            if (string.IsNullOrWhiteSpace(firstName))
+                throw new ArgumentException("First name cannot be empty");
+            if (string.IsNullOrWhiteSpace(lastName))
+                throw new ArgumentException("Last name cannot be empty");
+
             AuthUtils.ValidateRegistrationCredentials(email, password, _applicantRepository);
             var id = Guid.NewGuid().ToString();
             var applicant = new Applicant()
@@ -59,14 +64,14 @@ namespace AggieRent.Services
 
             if (firstName != null)
             {
-                if (firstName.Equals(""))
+                if (string.IsNullOrWhiteSpace(firstName))
                     throw new ArgumentException("First name cannot be empty");
                 applicant.FirstName = firstName;
             }
 
             if (lastName != null)
             {
-                if (lastName.Equals(""))
+                if (string.IsNullOrWhiteSpace(lastName))
                     throw new ArgumentException("Last name cannot be empty");
                 applicant.LastName = lastName;
             }
@@ -85,21 +90,48 @@ namespace AggieRent.Services
 
         public void ResetApplicantEmail(string id, string newEmail)
         {
-            // TODO: Implement ResetApplicantEmail
-            throw new Exception("Method not implemented yet!");
+            var applicant =
+                _applicantRepository.Get(id)
+                ?? throw new ArgumentException("Applicant ID not found");
+
+            if (!AuthUtils.ValidateEmail(newEmail))
+                throw new ArgumentException("Invalid email format");
+
+            var normalizedEmail = AuthUtils.NormalizeEmail(newEmail);
+
+            if (normalizedEmail.Equals(applicant.Email))
+                throw new ArgumentException("Email is not modified");
+
+            var existingApplicant = _applicantRepository
+                .GetAll()
+                .FirstOrDefault(a => a.Email == normalizedEmail);
+            if (existingApplicant != null)
+                throw new ArgumentException("Email is already used by another account");
+
+            applicant.Email = normalizedEmail;
+            _applicantRepository.Update(applicant);
         }
 
         public void ResetApplicantPassword(string id, string newPassword)
         {
-            // TODO: Implement ResetApplicantPassword
-            throw new Exception("Method not implemented yet!");
+            var applicant =
+                _applicantRepository.Get(id)
+                ?? throw new ArgumentException("Applicant ID not found");
+
+            if (!AuthUtils.ValidatePassword(newPassword))
+                throw new ArgumentException(
+                    "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number"
+                );
+
+            applicant.HashedPassword = BC.HashPassword(newPassword);
+            _applicantRepository.Update(applicant);
         }
 
         public void DeleteApplicant(string id)
         {
             var applicant =
                 _applicantRepository.Get(id)
-                ?? throw new ArgumentException("User ID doesn't exist");
+                ?? throw new ArgumentException("Applicant ID not found");
             _applicantRepository.Remove(applicant);
         }
     }
