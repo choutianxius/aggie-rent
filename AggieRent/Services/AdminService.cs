@@ -7,9 +7,9 @@ namespace AggieRent.Services
     {
         private readonly IAdminRepository _adminRepository = adminRepository;
 
-        public Admin? GetAdminById(string Id)
+        public Admin? GetAdminById(string id)
         {
-            return null;
+            return _adminRepository.GetVerbose(id);
         }
 
         public IEnumerable<Admin> GetAdmins()
