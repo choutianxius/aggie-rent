@@ -69,4 +69,29 @@ namespace AggieRent.Tests.Services
             mockAdminRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Never);
         }
     }
+
+    public class AdminService_GetAdminsShould
+    {
+        [Fact]
+        public void GetAdmins_ThenReturnAdmins()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin1@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository.Setup((x) => x.GetAll()).Returns(admins.AsQueryable());
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            var returnedAdmins = adminService.GetAdmins();
+
+            Assert.Equivalent(admins, returnedAdmins);
+            mockAdminRepository.Verify((x) => x.GetAll(), Times.Once);
+        }
+    }
 }

@@ -14,7 +14,7 @@ namespace AggieRent.Services
 
         public IEnumerable<Admin> GetAdmins()
         {
-            return [];
+            return _adminRepository.GetAll().ToList();
         }
 
         public string CreateAdmin(string email, string password)
