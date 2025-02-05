@@ -42,5 +42,31 @@ namespace AggieRent.Tests.Services
             mockAdminRepository.Verify((x) => x.GetVerbose(admin.Id), Times.Once);
             mockAdminRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Never);
         }
+
+        [Fact]
+        public void GetAdminById_NonExistentId_ThenReturnNull()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin1@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository
+                .Setup((x) => x.GetVerbose(It.IsAny<string>()))
+                .Returns((string id) => admins.FirstOrDefault((admin) => admin.Id.Equals(id)));
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            var admin = adminService.GetAdminById("abcde12345");
+
+            Assert.Null(admin);
+            Assert.Single(admins);
+            mockAdminRepository.Verify((x) => x.GetVerbose("abcde12345"), Times.Once);
+            mockAdminRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Never);
+        }
     }
 }
