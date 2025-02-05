@@ -1,0 +1,46 @@
+using AggieRent.DataAccess;
+using AggieRent.Models;
+using AggieRent.Services;
+using Moq;
+using Xunit;
+
+namespace AggieRent.Tests.Services
+{
+    public class AdminsService_GetAdminByIdShould
+    {
+        [Fact]
+        public void GetAdminById_GoodId_ThenReturnAdmin()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin1@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin2@tamu.edu",
+                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository
+                .Setup((x) => x.GetVerbose(It.IsAny<string>()))
+                .Returns((string id) => admins.FirstOrDefault((admin) => admin.Id.Equals(id)));
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            var admin = adminService.GetAdminById(admins[0].Id);
+
+            Assert.NotNull(admin);
+            Assert.Equal(admins[0].Id, admin.Id);
+            Assert.Equal("admin1@tamu.edu", admin.Email);
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admin.HashedPassword));
+            Assert.Equal(2, admins.Count);
+            mockAdminRepository.Verify((x) => x.GetVerbose(admin.Id), Times.Once);
+            mockAdminRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Never);
+        }
+    }
+}
