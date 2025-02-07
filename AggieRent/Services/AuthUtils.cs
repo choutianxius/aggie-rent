@@ -14,6 +14,11 @@ namespace AggieRent.Services
 
         private static readonly Regex passwordRegex = PasswordRegex();
 
+        [GeneratedRegex(@"\s")]
+        private static partial Regex WhiteSpaceRegex();
+
+        private static readonly Regex whiteSpaceRegex = WhiteSpaceRegex();
+
         public static void ValidateRegistrationCredentials<TUser>(
             string email,
             string password,
@@ -38,7 +43,7 @@ namespace AggieRent.Services
 
         public static string NormalizeEmail(string email)
         {
-            return email.ToLower();
+            return whiteSpaceRegex.Replace(email, "").ToLower();
         }
 
         public static bool ValidateEmail(string email)

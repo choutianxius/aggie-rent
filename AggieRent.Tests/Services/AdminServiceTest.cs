@@ -94,4 +94,54 @@ namespace AggieRent.Tests.Services
             mockAdminRepository.Verify((x) => x.GetAll(), Times.Once);
         }
     }
+
+    public class AdminService_CreateAdminShould
+    {
+        [Theory]
+        [InlineData("admin2@tamu.edu")]
+        [InlineData(" ADMIN2@tamu.edu")]
+        [InlineData("aDmin2@TAMU.EDU")]
+        [InlineData("aDmin2@TAMU.edu ")]
+        [InlineData("admin2 @tamu.edu")]
+        public void CreateAdmin_GoodInput_ThenReturnCreatedId(string email)
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin1@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns((string id) => admins.FirstOrDefault((admin) => admin.Id.Equals(id)));
+            mockAdminRepository
+                .Setup((x) => x.Add(It.IsAny<Admin>()))
+                .Callback(
+                    (Admin admin) =>
+                    {
+                        if (admins.FirstOrDefault((admin_) => admin_.Id.Equals(admin.Id)) != null)
+                            throw new ArgumentException("Duplicate ID");
+                        admins.Add(admin);
+                    }
+                );
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            var admin1Id = admins[0].Id;
+            var createdId = adminService.CreateAdmin(email, "superStr0ngP@ssw0rd");
+            Assert.Equal(2, admins.Count);
+            var admin1 = admins.FirstOrDefault((a) => a.Id.Equals(admin1Id));
+            Assert.NotNull(admin1);
+            Assert.Equal("admin1@tamu.edu", admin1.Email);
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admin1.HashedPassword));
+            var admin2 = admins.FirstOrDefault((a) => a.Id.Equals(createdId));
+            Assert.NotNull(admin2);
+            Assert.Equal("admin2@tamu.edu", admin2.Email);
+            Assert.True(BC.Verify("superStr0ngP@ssw0rd", admin2.HashedPassword));
+            mockAdminRepository.Verify((x) => x.Add(admin2), Times.Once);
+        }
+    }
 }

@@ -95,6 +95,10 @@ namespace AggieRent.Tests.Services
         [Theory]
         [InlineData("aggie1@tamu.edu")]
         [InlineData("AggiE1@tAmu.edu")]
+        [InlineData("aggie1@tamu.edu ")]
+        [InlineData(" aggie1@tamu.edu")]
+        [InlineData("aggie1@tamu.edu\t")]
+        [InlineData("aggie1 @tamu.edu")]
         public void CreateApplicant_GoodInput_ThenAddApplicantAndReturnId(string email)
         {
             var mockApplicantRepository = new Mock<IApplicantRepository>();

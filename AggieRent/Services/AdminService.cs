@@ -19,7 +19,18 @@ namespace AggieRent.Services
 
         public string CreateAdmin(string email, string password)
         {
-            return "";
+            var normalizedEmail = AuthUtils.NormalizeEmail(email);
+            AuthUtils.ValidateRegistrationCredentials(normalizedEmail, password, _adminRepository);
+            var id = Guid.NewGuid().ToString();
+            _adminRepository.Add(
+                new()
+                {
+                    Id = id,
+                    Email = normalizedEmail,
+                    HashedPassword = BC.HashPassword(password),
+                }
+            );
+            return id;
         }
 
         public void ResetAdminEmail(string id, string email) { }
