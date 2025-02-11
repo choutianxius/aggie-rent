@@ -116,9 +116,6 @@ namespace AggieRent.Tests.Services
                 },
             ];
             mockAdminRepository
-                .Setup((x) => x.Get(It.IsAny<string>()))
-                .Returns((string id) => admins.FirstOrDefault((admin) => admin.Id.Equals(id)));
-            mockAdminRepository
                 .Setup((x) => x.Add(It.IsAny<Admin>()))
                 .Callback(
                     (Admin admin) =>
@@ -142,6 +139,100 @@ namespace AggieRent.Tests.Services
             Assert.Equal("admin2@tamu.edu", admin2.Email);
             Assert.True(BC.Verify("superStr0ngP@ssw0rd", admin2.HashedPassword));
             mockAdminRepository.Verify((x) => x.Add(admin2), Times.Once);
+        }
+
+        [Theory]
+        [InlineData("aggie@tamu.edu")]
+        [InlineData("aggie @ tamu.edu")]
+        [InlineData("AGGIE@TAMU.EDU")]
+        [InlineData("Aggie@tamu.edu")]
+        [InlineData("aggie@TAMU.EDU")]
+        [InlineData("aggie@tamu.edu ")]
+        [InlineData(" aggie@tamu.edu")]
+        [InlineData(" aggie@tamu.edu\n")]
+        public void CreateAdmin_DuplicateEmail_ThenArgumentException(string email)
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository.Setup((x) => x.GetAll()).Returns(admins.AsQueryable());
+            mockAdminRepository
+                .Setup((x) => x.Add(It.IsAny<Admin>()))
+                .Callback(
+                    (Admin admin) =>
+                    {
+                        if (admins.FirstOrDefault((admin_) => admin_.Id.Equals(admin.Id)) != null)
+                            throw new ArgumentException("Duplicate ID");
+                        admins.Add(admin);
+                    }
+                );
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            void action() => adminService.CreateAdmin(email, "superStr0ngP@ssw0rd");
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Email already in use", ae.Message);
+            Assert.Single(admins);
+            Assert.Equal("aggie@tamu.edu", admins[0].Email);
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            mockAdminRepository.Verify((x) => x.GetAll(), Times.Once);
+            mockAdminRepository.Verify((x) => x.Add(It.IsAny<Admin>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("aB1_")]
+        [InlineData("abcdefgh")]
+        [InlineData("a1b2c3d4")]
+        [InlineData("a1b2c3d_")]
+        [InlineData("superstrongp@ssw0rd")]
+        [InlineData("SUPERSTRONGP@SSW0RD")]
+        [InlineData("SuperStrongPassw0rd")]
+        [InlineData("SuperStrongP@ssword")]
+        [InlineData("Emoj1S_n0T_All0w3d🥲")]
+        public void CreateAdmin_InvalidPassword_ThenArgumentException(string password)
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin1@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository.Setup((x) => x.GetAll()).Returns(admins.AsQueryable());
+            mockAdminRepository
+                .Setup((x) => x.Add(It.IsAny<Admin>()))
+                .Callback(
+                    (Admin admin) =>
+                    {
+                        if (admins.FirstOrDefault((admin_) => admin_.Id.Equals(admin.Id)) != null)
+                            throw new ArgumentException("Duplicate ID");
+                        admins.Add(admin);
+                    }
+                );
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            void action() => adminService.CreateAdmin("admin2@tamu.edu", password);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal(
+                "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number",
+                ae.Message
+            );
+            Assert.Single(admins);
+            Assert.Equal("admin1@tamu.edu", admins[0].Email);
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            mockAdminRepository.Verify((x) => x.Add(It.IsAny<Admin>()), Times.Never);
         }
     }
 }
