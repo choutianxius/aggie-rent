@@ -619,4 +619,97 @@ namespace AggieRent.Tests.Services
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
         }
     }
+
+    public class AdminService_DeleteAdminShould
+    {
+        [Fact]
+        public void DeleteAdmin_ExistentId_ThenDelete()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin1@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin2@tamu.edu",
+                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                },
+            ];
+            var admin1Id = admins[0].Id;
+            var admin1 = admins[0];
+            var admin2Id = admins[1].Id;
+            mockAdminRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns((string id) => admins.FirstOrDefault((admin) => admin.Id.Equals(id)));
+            mockAdminRepository
+                .Setup((x) => x.Remove(It.IsAny<Admin>()))
+                .Callback(
+                    (Admin admin) =>
+                    {
+                        if (!admins.Contains(admin))
+                            throw new ArgumentException("Non-existent entity");
+                        admins.Remove(admin);
+                    }
+                );
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            adminService.DeleteAdmin(admins[0].Id);
+
+            Assert.Single(admins);
+            var admin2 = admins.FirstOrDefault((admin) => admin.Id.Equals(admin2Id));
+            Assert.NotNull(admin2);
+            Assert.Equal("admin2@tamu.edu", admin2.Email);
+            Assert.True(BC.Verify("superStr0ngP@ssw0rd", admin2.HashedPassword));
+            mockAdminRepository.Verify((x) => x.Get(admin1Id), Times.Once);
+            mockAdminRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Once);
+            mockAdminRepository.Verify((x) => x.Remove(admin1), Times.Once);
+            mockAdminRepository.Verify((x) => x.Remove(It.IsAny<Admin>()), Times.Once);
+        }
+
+        [Fact]
+        public void DeleteAdmin_NonExistentId_ThenArgumentException()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin1@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns((string id) => admins.FirstOrDefault((admin) => admin.Id.Equals(id)));
+            mockAdminRepository
+                .Setup((x) => x.Remove(It.IsAny<Admin>()))
+                .Callback(
+                    (Admin admin) =>
+                    {
+                        if (!admins.Contains(admin))
+                            throw new ArgumentException("Non-existent entity");
+                        admins.Remove(admin);
+                    }
+                );
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            void action() => adminService.DeleteAdmin("abcd1234");
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Admin ID not found", ae.Message);
+            Assert.Single(admins);
+            Assert.Equal("admin1@tamu.edu", admins[0].Email);
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            mockAdminRepository.Verify((x) => x.Get("abcd1234"), Times.Once);
+            mockAdminRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Once);
+            mockAdminRepository.Verify((x) => x.Remove(It.IsAny<Admin>()), Times.Never);
+        }
+    }
 }

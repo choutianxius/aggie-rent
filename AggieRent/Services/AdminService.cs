@@ -64,6 +64,11 @@ namespace AggieRent.Services
             _adminRepository.Update(admin);
         }
 
-        public void DeleteAdmin(string id) { }
+        public void DeleteAdmin(string id)
+        {
+            var admin =
+                _adminRepository.Get(id) ?? throw new ArgumentException("Admin ID not found");
+            _adminRepository.Remove(admin);
+        }
     }
 }
