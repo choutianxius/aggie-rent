@@ -483,4 +483,140 @@ namespace AggieRent.Tests.Services
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
         }
     }
+
+    public class AdminService_ResetAdminPasswordShould
+    {
+        [Fact]
+        public void ResetAdminPassword_GoodInput_ThenReset()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns((string id) => admins.FirstOrDefault((admin) => admin.Id.Equals(id)));
+            mockAdminRepository
+                .Setup((x) => x.Update(It.IsAny<Admin>()))
+                .Callback(
+                    (Admin admin) =>
+                    {
+                        var existingAdmin =
+                            admins.FirstOrDefault((admin1) => admin1.Id.Equals(admin.Id))
+                            ?? throw new ArgumentException("Nonexistent ID");
+                        existingAdmin.Email = admin.Email;
+                        existingAdmin.HashedPassword = admin.HashedPassword;
+                    }
+                );
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            adminService.ResetAdminPassword(admins[0].Id, "superStr0ngP@ssw0rd");
+
+            Assert.Single(admins);
+            Assert.True(BC.Verify("superStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.False(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            mockAdminRepository.Verify((x) => x.Get(admins[0].Id), Times.Once);
+            mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Once);
+        }
+
+        [Fact]
+        public void ResetAdminPassword_UnknownAdminId_ThenArgumentException()
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns((string id) => admins.FirstOrDefault((admin) => admin.Id.Equals(id)));
+            mockAdminRepository
+                .Setup((x) => x.Update(It.IsAny<Admin>()))
+                .Callback(
+                    (Admin admin) =>
+                    {
+                        var existingAdmin =
+                            admins.FirstOrDefault((admin1) => admin1.Id.Equals(admin.Id))
+                            ?? throw new ArgumentException("Nonexistent ID");
+                        existingAdmin.Email = admin.Email;
+                        existingAdmin.HashedPassword = admin.HashedPassword;
+                    }
+                );
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            void action() => adminService.ResetAdminPassword("abcd1234", "superStr0ngP@ssw0rd");
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Admin ID not found", ae.Message);
+            Assert.Single(admins);
+            Assert.False(BC.Verify("superStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            mockAdminRepository.Verify((x) => x.Get("abcd1234"), Times.Once);
+            mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
+        }
+
+        [Theory]
+        [InlineData("")]
+        [InlineData("aB1_")]
+        [InlineData("abcdefgh")]
+        [InlineData("a1b2c3d4")]
+        [InlineData("a1b2c3d_")]
+        [InlineData("superstrongp@ssw0rd")]
+        [InlineData("SUPERSTRONGP@SSW0RD")]
+        [InlineData("SuperStrongPassw0rd")]
+        [InlineData("SuperStrongP@ssword")]
+        [InlineData("Emoj1S_n0T_All0w3d🥲")]
+        public void ResetAdminPassword_InvalidNewPassword_ThenArgumentException(string password)
+        {
+            var mockAdminRepository = new Mock<IAdminRepository>();
+            List<Admin> admins =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "admin@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                },
+            ];
+            mockAdminRepository
+                .Setup((x) => x.Get(It.IsAny<string>()))
+                .Returns((string id) => admins.FirstOrDefault((admin) => admin.Id.Equals(id)));
+            mockAdminRepository
+                .Setup((x) => x.Update(It.IsAny<Admin>()))
+                .Callback(
+                    (Admin admin) =>
+                    {
+                        var existingAdmin =
+                            admins.FirstOrDefault((admin1) => admin1.Id.Equals(admin.Id))
+                            ?? throw new ArgumentException("Nonexistent ID");
+                        existingAdmin.Email = admin.Email;
+                        existingAdmin.HashedPassword = admin.HashedPassword;
+                    }
+                );
+            var adminService = new AdminService(mockAdminRepository.Object);
+
+            void action() => adminService.ResetAdminPassword(admins[0].Id, password);
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal(
+                "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number",
+                ae.Message
+            );
+            Assert.Single(admins);
+            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            mockAdminRepository.Verify((x) => x.Get(admins[0].Id), Times.Once);
+            mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
+        }
+    }
 }

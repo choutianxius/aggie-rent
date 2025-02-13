@@ -52,7 +52,17 @@ namespace AggieRent.Services
             _adminRepository.Update(admin);
         }
 
-        public void ResetAdminPassword(string id, string password) { }
+        public void ResetAdminPassword(string id, string password)
+        {
+            var admin =
+                _adminRepository.Get(id) ?? throw new ArgumentException("Admin ID not found");
+            if (!AuthUtils.ValidatePassword(password))
+                throw new ArgumentException(
+                    "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number"
+                );
+            admin.HashedPassword = BC.HashPassword(password);
+            _adminRepository.Update(admin);
+        }
 
         public void DeleteAdmin(string id) { }
     }

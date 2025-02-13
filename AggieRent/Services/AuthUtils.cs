@@ -62,6 +62,9 @@ namespace AggieRent.Services
         /// <summary>
         /// Verify the format of a password during registration
         /// </summary>
+        /// <returns>
+        /// true if input password is in valid format, false otherwise
+        /// </returns>
         public static bool ValidatePassword(string password)
         {
             return passwordRegex.IsMatch(password);
