@@ -10,7 +10,9 @@ namespace AggieRent.Services
 
         string CreateAdmin(string email, string password);
 
-        void UpdateAdmin(string id, string? email, string? password);
+        void ResetAdminEmail(string id, string email);
+
+        void ResetAdminPassword(string id, string password);
 
         void DeleteAdmin(string id);
     }

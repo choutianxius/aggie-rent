@@ -32,12 +32,17 @@ namespace AggieRent.Services
             if (string.IsNullOrWhiteSpace(lastName))
                 throw new ArgumentException("Last name cannot be empty");
 
-            AuthUtils.ValidateRegistrationCredentials(email, password, _applicantRepository);
+            var normalizedEmail = AuthUtils.NormalizeEmail(email);
+            AuthUtils.ValidateRegistrationCredentials(
+                normalizedEmail,
+                password,
+                _applicantRepository
+            );
             var id = Guid.NewGuid().ToString();
             var applicant = new Applicant()
             {
                 Id = id,
-                Email = AuthUtils.NormalizeEmail(email),
+                Email = normalizedEmail,
                 HashedPassword = BC.HashPassword(password),
                 FirstName = firstName,
                 LastName = lastName,

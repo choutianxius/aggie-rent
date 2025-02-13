@@ -1,4 +1,3 @@
-using System.Runtime.InteropServices;
 using AggieRent.DataAccess;
 using AggieRent.Models;
 using AggieRent.Services;
@@ -96,6 +95,10 @@ namespace AggieRent.Tests.Services
         [Theory]
         [InlineData("aggie1@tamu.edu")]
         [InlineData("AggiE1@tAmu.edu")]
+        [InlineData("aggie1@tamu.edu ")]
+        [InlineData(" aggie1@tamu.edu")]
+        [InlineData("aggie1@tamu.edu\t")]
+        [InlineData("aggie1 @tamu.edu")]
         public void CreateApplicant_GoodInput_ThenAddApplicantAndReturnId(string email)
         {
             var mockApplicantRepository = new Mock<IApplicantRepository>();
@@ -811,6 +814,44 @@ namespace AggieRent.Tests.Services
             Assert.Null(applicants[1].OccupiedApartment);
 
             mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
+            mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
+        }
+
+        [Fact]
+        public void ResetApplicantEmail_NonExistentId_ThenArgumentException()
+        {
+            var mockApplicantRepository = new Mock<IApplicantRepository>();
+            List<Applicant> applicants =
+            [
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie1@tamu.edu",
+                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Doe",
+                },
+                new()
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    Email = "aggie2@tamu.edu",
+                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    FirstName = "John",
+                    LastName = "Deer",
+                },
+            ];
+            mockApplicantRepository
+                .Setup(x => x.Get(It.IsAny<string>()))
+                .Returns(
+                    (string id) => applicants.FirstOrDefault(applicant => applicant.Id.Equals(id))
+                );
+            var applicantService = new ApplicantService(mockApplicantRepository.Object);
+
+            void action() => applicantService.ResetApplicantEmail("abcd123456", "aggie3@tamu.edu");
+
+            var ae = Assert.Throws<ArgumentException>(action);
+            Assert.Equal("Applicant ID not found", ae.Message);
+            mockApplicantRepository.Verify((x) => x.Get("abcd123456"), Times.Once);
             mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
     }
