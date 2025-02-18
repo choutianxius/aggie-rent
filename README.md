@@ -30,7 +30,7 @@ dotnet test
 
 - VS Code is the recommended IDE for working with this project.
 
-- You should have .NET 8.0 available in your environment. To check, run
+- You should have [.NET 9.0](https://dotnet.microsoft.com/en-us/download) available in your environment. To check, run
 
   ```shell
   dotnet --version
@@ -48,4 +48,4 @@ dotnet test
   dotnet dotnet-csharpier .
   ```
 
-  You should also set `Charpier` to be the default formatter, enable `Format on Save` and `Format on Paste` in your VS Code settings.
+  You should also set `CSharpier` to be the default formatter and enable `Format on Save` and `Format on Paste` in your VS Code settings.
