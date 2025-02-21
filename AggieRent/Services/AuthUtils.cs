@@ -71,15 +71,15 @@ namespace AggieRent.Services
             return passwordRegex.IsMatch(password);
         }
 
-        public static string HashPassword(string inputKey)
+        public static string HashPassword(string plainText)
         {
-            var hashedPassword = Argon2.Hash(inputKey);
+            var hashedPassword = Argon2.Hash(plainText);
             return hashedPassword;
         }
 
-        public static bool Verify(string password, string hashedPassword)
+        public static bool Verify(string plainText, string hash)
         {
-            return Argon2.Verify(hashedPassword, password);
+            return Argon2.Verify(hash, plainText);
         }
     }
 }
