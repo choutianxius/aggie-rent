@@ -100,7 +100,7 @@ namespace AggieRent.Tests.Controllers
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = email,
-                HashedPassword = BC.HashPassword("verysTR0NGp@SSW0RD"),
+                HashedPassword = AuthUtils.HashPassword("verysTR0NGp@SSW0RD"),
                 FirstName = "John",
                 LastName = "Doe",
             };
@@ -108,14 +108,14 @@ namespace AggieRent.Tests.Controllers
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = email,
-                HashedPassword = BC.HashPassword("verysTR0NGp@SSW0RD"),
+                HashedPassword = AuthUtils.HashPassword("verysTR0NGp@SSW0RD"),
                 Name = "John Doe",
             };
             var admin = new Admin()
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = email,
-                HashedPassword = BC.HashPassword("verysTR0NGp@SSW0RD"),
+                HashedPassword = AuthUtils.HashPassword("verysTR0NGp@SSW0RD"),
             };
             mockAuthService
                 .Setup(x => x.LoginApplicant(It.IsAny<string>(), It.IsAny<string>()))

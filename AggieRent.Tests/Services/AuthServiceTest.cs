@@ -51,7 +51,7 @@ namespace AggieRent.Tests.Services
             // Assert
             Assert.Single(applicants);
             Assert.Equal(email.ToLower(), applicants[0].Email);
-            Assert.True(BC.Verify(testPassword, applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify(testPassword, applicants[0].HashedPassword));
             Assert.Equal(testFirstName, applicants[0].FirstName);
             Assert.Equal(testLastName, applicants[0].LastName);
             Assert.Equal(testGender, applicants[0].Gender);
@@ -121,7 +121,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = email.ToLower(),
-                    HashedPassword = BC.HashPassword("SUperStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("SUperStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -259,7 +259,7 @@ namespace AggieRent.Tests.Services
 
             Assert.Single(applicants);
             Assert.Equal(testEmail.ToLower(), applicants[0].Email);
-            Assert.True(BC.Verify(password, applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify(password, applicants[0].HashedPassword));
             Assert.Equal(testFirstName, applicants[0].FirstName);
             Assert.Equal(testLastName, applicants[0].LastName);
             Assert.Equal(testGender, applicants[0].Gender);
@@ -289,7 +289,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = testEmail,
-                    HashedPassword = BC.HashPassword(testPassword),
+                    HashedPassword = AuthUtils.HashPassword(testPassword),
                     FirstName = testFirstName,
                     LastName = testLastName,
                     Gender = testGender,
@@ -350,7 +350,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = testEmail,
-                    HashedPassword = BC.HashPassword(testPassword),
+                    HashedPassword = AuthUtils.HashPassword(testPassword),
                     FirstName = testFirstName,
                     LastName = testLastName,
                     Gender = testGender,
@@ -394,7 +394,7 @@ namespace AggieRent.Tests.Services
                     Id = Guid.NewGuid().ToString(),
                     Email = testEmail,
                     Name = testName,
-                    HashedPassword = BC.HashPassword(testPassword),
+                    HashedPassword = AuthUtils.HashPassword(testPassword),
                     Description = testDescription,
                 },
             ];
@@ -449,7 +449,7 @@ namespace AggieRent.Tests.Services
                     Id = Guid.NewGuid().ToString(),
                     Email = testEmail,
                     Name = testName,
-                    HashedPassword = BC.HashPassword(testPassword),
+                    HashedPassword = AuthUtils.HashPassword(testPassword),
                     Description = testDescription,
                 },
             ];
@@ -486,7 +486,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = testEmail,
-                    HashedPassword = BC.HashPassword(testPassword),
+                    HashedPassword = AuthUtils.HashPassword(testPassword),
                 },
             ];
 
@@ -537,7 +537,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = testEmail,
-                    HashedPassword = BC.HashPassword(testPassword),
+                    HashedPassword = AuthUtils.HashPassword(testPassword),
                 },
             ];
 

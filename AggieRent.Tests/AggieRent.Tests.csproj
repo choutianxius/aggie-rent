@@ -23,12 +23,10 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AggieRent\AggieRent.csproj" />
-    <Using Include="BCrypt.Net.BCrypt" Alias="BC" />
   </ItemGroup>
 
 </Project>

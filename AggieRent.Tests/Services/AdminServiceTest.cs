@@ -18,13 +18,13 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
                 new()
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin2@tamu.edu",
-                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("superStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -37,7 +37,7 @@ namespace AggieRent.Tests.Services
             Assert.NotNull(admin);
             Assert.Equal(admins[0].Id, admin.Id);
             Assert.Equal("admin1@tamu.edu", admin.Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admin.HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admin.HashedPassword));
             Assert.Equal(2, admins.Count);
             mockAdminRepository.Verify((x) => x.GetVerbose(admin.Id), Times.Once);
             mockAdminRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Never);
@@ -53,7 +53,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -82,7 +82,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository.Setup((x) => x.GetAll()).Returns(admins.AsQueryable());
@@ -112,7 +112,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -133,11 +133,11 @@ namespace AggieRent.Tests.Services
             var admin1 = admins.FirstOrDefault((a) => a.Id.Equals(admin1Id));
             Assert.NotNull(admin1);
             Assert.Equal("admin1@tamu.edu", admin1.Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admin1.HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admin1.HashedPassword));
             var admin2 = admins.FirstOrDefault((a) => a.Id.Equals(createdId));
             Assert.NotNull(admin2);
             Assert.Equal("admin2@tamu.edu", admin2.Email);
-            Assert.True(BC.Verify("superStr0ngP@ssw0rd", admin2.HashedPassword));
+            Assert.True(AuthUtils.Verify("superStr0ngP@ssw0rd", admin2.HashedPassword));
             mockAdminRepository.Verify((x) => x.Add(admin2), Times.Once);
         }
 
@@ -159,7 +159,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository.Setup((x) => x.GetAll()).Returns(admins.AsQueryable());
@@ -181,7 +181,7 @@ namespace AggieRent.Tests.Services
             Assert.Equal("Email already in use", ae.Message);
             Assert.Single(admins);
             Assert.Equal("aggie@tamu.edu", admins[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.GetAll(), Times.Once);
             mockAdminRepository.Verify((x) => x.Add(It.IsAny<Admin>()), Times.Never);
         }
@@ -223,7 +223,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository.Setup((x) => x.GetAll()).Returns(admins.AsQueryable());
@@ -248,7 +248,7 @@ namespace AggieRent.Tests.Services
             );
             Assert.Single(admins);
             Assert.Equal("admin1@tamu.edu", admins[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.Add(It.IsAny<Admin>()), Times.Never);
         }
     }
@@ -270,7 +270,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -295,7 +295,7 @@ namespace AggieRent.Tests.Services
 
             Assert.Single(admins);
             Assert.Equal("admin2@tamu.edu", admins[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.Get(admins[0].Id), Times.Once);
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Once);
         }
@@ -315,7 +315,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -342,7 +342,7 @@ namespace AggieRent.Tests.Services
             Assert.Equal("Invalid email format", ae.Message);
             Assert.Single(admins);
             Assert.Equal("admin1@tamu.edu", admins[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.Get(admins[0].Id), Times.Never);
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
         }
@@ -365,7 +365,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -392,7 +392,7 @@ namespace AggieRent.Tests.Services
             Assert.Equal("Email is not modified", ae.Message);
             Assert.Single(admins);
             Assert.Equal("aggie@tamu.edu", admins[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.Get(admins[0].Id), Times.Once);
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
         }
@@ -412,13 +412,13 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
                 new()
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin2@tamu.edu",
-                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("superStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -445,9 +445,9 @@ namespace AggieRent.Tests.Services
             Assert.Equal("Email already in use", ae.Message);
             Assert.Equal(2, admins.Count);
             Assert.Equal("admin1@tamu.edu", admins[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             Assert.Equal("admin2@tamu.edu", admins[1].Email);
-            Assert.True(BC.Verify("superStr0ngP@ssw0rd", admins[1].HashedPassword));
+            Assert.True(AuthUtils.Verify("superStr0ngP@ssw0rd", admins[1].HashedPassword));
             mockAdminRepository.Verify((x) => x.Get(admins[0].Id), Times.Once);
             mockAdminRepository.Verify((x) => x.GetAll(), Times.Once);
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
@@ -463,7 +463,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -478,7 +478,7 @@ namespace AggieRent.Tests.Services
             Assert.Equal("Admin ID not found", ae.Message);
             Assert.Single(admins);
             Assert.Equal("aggie@tamu.edu", admins[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.Get("abcd1234"), Times.Once);
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
         }
@@ -496,7 +496,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -519,8 +519,8 @@ namespace AggieRent.Tests.Services
             adminService.ResetAdminPassword(admins[0].Id, "superStr0ngP@ssw0rd");
 
             Assert.Single(admins);
-            Assert.True(BC.Verify("superStr0ngP@ssw0rd", admins[0].HashedPassword));
-            Assert.False(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("superStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.False(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.Get(admins[0].Id), Times.Once);
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Once);
         }
@@ -535,7 +535,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -560,8 +560,8 @@ namespace AggieRent.Tests.Services
             var ae = Assert.Throws<ArgumentException>(action);
             Assert.Equal("Admin ID not found", ae.Message);
             Assert.Single(admins);
-            Assert.False(BC.Verify("superStr0ngP@ssw0rd", admins[0].HashedPassword));
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.False(AuthUtils.Verify("superStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.Get("abcd1234"), Times.Once);
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
         }
@@ -586,7 +586,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -614,7 +614,7 @@ namespace AggieRent.Tests.Services
                 ae.Message
             );
             Assert.Single(admins);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.Get(admins[0].Id), Times.Once);
             mockAdminRepository.Verify((x) => x.Update(It.IsAny<Admin>()), Times.Never);
         }
@@ -632,13 +632,13 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
                 new()
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin2@tamu.edu",
-                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("superStr0ngP@ssw0rd"),
                 },
             ];
             var admin1Id = admins[0].Id;
@@ -665,7 +665,7 @@ namespace AggieRent.Tests.Services
             var admin2 = admins.FirstOrDefault((admin) => admin.Id.Equals(admin2Id));
             Assert.NotNull(admin2);
             Assert.Equal("admin2@tamu.edu", admin2.Email);
-            Assert.True(BC.Verify("superStr0ngP@ssw0rd", admin2.HashedPassword));
+            Assert.True(AuthUtils.Verify("superStr0ngP@ssw0rd", admin2.HashedPassword));
             mockAdminRepository.Verify((x) => x.Get(admin1Id), Times.Once);
             mockAdminRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Once);
             mockAdminRepository.Verify((x) => x.Remove(admin1), Times.Once);
@@ -682,7 +682,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "admin1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                 },
             ];
             mockAdminRepository
@@ -706,7 +706,7 @@ namespace AggieRent.Tests.Services
             Assert.Equal("Admin ID not found", ae.Message);
             Assert.Single(admins);
             Assert.Equal("admin1@tamu.edu", admins[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", admins[0].HashedPassword));
             mockAdminRepository.Verify((x) => x.Get("abcd1234"), Times.Once);
             mockAdminRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Once);
             mockAdminRepository.Verify((x) => x.Remove(It.IsAny<Admin>()), Times.Never);

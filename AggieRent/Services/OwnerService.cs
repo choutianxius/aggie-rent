@@ -24,7 +24,7 @@ public class OwnerService(IOwnerRepository ownerRepository) : IOwnerService
         {
             Id = id,
             Email = AuthUtils.NormalizeEmail(email),
-            HashedPassword = BC.HashPassword(password),
+            HashedPassword = AuthUtils.HashPassword(password),
             Name = name,
         };
         _ownerRepository.Add(owner);
@@ -76,7 +76,7 @@ public class OwnerService(IOwnerRepository ownerRepository) : IOwnerService
             throw new ArgumentException(
                 "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number"
             );
-        owner.HashedPassword = BC.HashPassword(newPassword);
+        owner.HashedPassword = AuthUtils.HashPassword(newPassword);
         _ownerRepository.Update(owner);
     }
 }
