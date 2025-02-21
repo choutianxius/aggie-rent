@@ -43,7 +43,7 @@ namespace AggieRent.Services
             {
                 Id = Guid.NewGuid().ToString(),
                 Email = AuthUtils.NormalizeEmail(email),
-                HashedPassword = BC.HashPassword(password),
+                HashedPassword = AuthUtils.HashPassword(password),
                 FirstName = firstName,
                 LastName = lastName,
                 Gender = gender ?? Gender.NotSet,
@@ -65,7 +65,7 @@ namespace AggieRent.Services
                     .GetAll()
                     .FirstOrDefault(u => u.Email.Equals(AuthUtils.NormalizeEmail(email)))
                 ?? throw new ArgumentException("Email not registered");
-            if (!BC.Verify(password, user.HashedPassword))
+            if (!AuthUtils.Verify(password, user.HashedPassword))
                 throw new ArgumentException("Wrong password");
             return user;
         }

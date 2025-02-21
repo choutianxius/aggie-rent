@@ -18,7 +18,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = Gender.Female,
@@ -75,7 +75,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -108,7 +108,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -146,7 +146,7 @@ namespace AggieRent.Tests.Services
             var createdApplicant = applicants.FirstOrDefault(a => a.Id == id);
             Assert.NotNull(createdApplicant);
             Assert.Equal(AuthUtils.NormalizeEmail(email), createdApplicant.Email);
-            Assert.True(BC.Verify(password, createdApplicant.HashedPassword));
+            Assert.True(AuthUtils.Verify(password, createdApplicant.HashedPassword));
             Assert.Equal(firstName, createdApplicant.FirstName);
             Assert.Equal(lastName, createdApplicant.LastName);
             Assert.Equal(gender, createdApplicant.Gender);
@@ -226,7 +226,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -345,7 +345,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -353,7 +353,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie2@tamu.edu",
-                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("superStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Deer",
                 },
@@ -379,7 +379,7 @@ namespace AggieRent.Tests.Services
 
             Assert.Equal("Johny", applicants[0].FirstName);
             Assert.Equal("Doey", applicants[0].LastName);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
             Assert.Equal(Gender.Male, applicants[0].Gender);
             Assert.Equal(new DateOnly(2000, 1, 1), applicants[0].Birthday);
             Assert.Equal("Hi I'm Johny Doey", applicants[0].Description);
@@ -390,7 +390,7 @@ namespace AggieRent.Tests.Services
 
             Assert.Equal("John", applicants[1].FirstName);
             Assert.Equal("Deer", applicants[1].LastName);
-            Assert.True(BC.Verify("superStr0ngP@ssw0rd", applicants[1].HashedPassword));
+            Assert.True(AuthUtils.Verify("superStr0ngP@ssw0rd", applicants[1].HashedPassword));
             Assert.Equal(Gender.NotSet, applicants[1].Gender);
             Assert.Null(applicants[1].Birthday);
             Assert.Null(applicants[1].Description);
@@ -410,7 +410,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -418,7 +418,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie2@tamu.edu",
-                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("superStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Deer",
                 },
@@ -462,7 +462,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -505,7 +505,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -542,7 +542,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = Gender.Female,
@@ -562,7 +562,7 @@ namespace AggieRent.Tests.Services
             mockApplicantRepository.Verify((x) => x.Get(applicants[0].Id), Times.Once);
             Assert.Single(applicants);
             Assert.Equal("aggie@tamu.edu", applicants[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
             Assert.Equal("John", applicants[0].FirstName);
             Assert.Equal("Doe", applicants[0].LastName);
             Assert.Equal(Gender.Female, applicants[0].Gender);
@@ -591,7 +591,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = Gender.Female,
@@ -613,7 +613,7 @@ namespace AggieRent.Tests.Services
             mockApplicantRepository.Verify((x) => x.GetAll(), Times.Once);
             Assert.Single(applicants);
             Assert.Equal(AuthUtils.NormalizeEmail(updatedEmail), applicants[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
             Assert.Equal("John", applicants[0].FirstName);
             Assert.Equal("Doe", applicants[0].LastName);
             Assert.Equal(Gender.Female, applicants[0].Gender);
@@ -639,7 +639,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = Gender.Female,
@@ -675,7 +675,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = Gender.Female,
@@ -686,7 +686,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie1@tamu.edu",
-                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("superStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Deer",
                     Gender = Gender.Male,
@@ -711,7 +711,7 @@ namespace AggieRent.Tests.Services
             mockApplicantRepository.Verify((x) => x.GetAll(), Times.Once);
 
             Assert.Equal("aggie@tamu.edu", applicants[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
             Assert.Equal("John", applicants[0].FirstName);
             Assert.Equal("Doe", applicants[0].LastName);
             Assert.Equal(Gender.Female, applicants[0].Gender);
@@ -723,7 +723,7 @@ namespace AggieRent.Tests.Services
             Assert.Null(applicants[0].OccupiedApartment);
 
             Assert.Equal("aggie1@tamu.edu", applicants[1].Email);
-            Assert.True(BC.Verify("superStr0ngP@ssw0rd", applicants[1].HashedPassword));
+            Assert.True(AuthUtils.Verify("superStr0ngP@ssw0rd", applicants[1].HashedPassword));
             Assert.Equal("John", applicants[1].FirstName);
             Assert.Equal("Deer", applicants[1].LastName);
             Assert.Equal(Gender.Male, applicants[1].Gender);
@@ -754,7 +754,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = Gender.Female,
@@ -765,7 +765,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie1@tamu.edu",
-                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("superStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Deer",
                     Gender = Gender.Male,
@@ -790,7 +790,7 @@ namespace AggieRent.Tests.Services
             mockApplicantRepository.Verify((x) => x.GetAll(), Times.Never);
 
             Assert.Equal("aggie@tamu.edu", applicants[0].Email);
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
             Assert.Equal("John", applicants[0].FirstName);
             Assert.Equal("Doe", applicants[0].LastName);
             Assert.Equal(Gender.Female, applicants[0].Gender);
@@ -802,7 +802,7 @@ namespace AggieRent.Tests.Services
             Assert.Null(applicants[0].OccupiedApartment);
 
             Assert.Equal("aggie1@tamu.edu", applicants[1].Email);
-            Assert.True(BC.Verify("superStr0ngP@ssw0rd", applicants[1].HashedPassword));
+            Assert.True(AuthUtils.Verify("superStr0ngP@ssw0rd", applicants[1].HashedPassword));
             Assert.Equal("John", applicants[1].FirstName);
             Assert.Equal("Deer", applicants[1].LastName);
             Assert.Equal(Gender.Male, applicants[1].Gender);
@@ -827,7 +827,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie1@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -835,7 +835,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie2@tamu.edu",
-                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("superStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Deer",
                 },
@@ -868,7 +868,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = Gender.Female,
@@ -887,8 +887,8 @@ namespace AggieRent.Tests.Services
             applicantService.ResetApplicantPassword(applicants[0].Id, "superStr0ngP@ssw0rd");
 
             Assert.Single(applicants);
-            Assert.True(BC.Verify("superStr0ngP@ssw0rd", applicants[0].HashedPassword));
-            Assert.False(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("superStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.False(AuthUtils.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
             Assert.Equal("aggie@tamu.edu", applicants[0].Email);
             Assert.Equal("John", applicants[0].FirstName);
             Assert.Equal("Doe", applicants[0].LastName);
@@ -913,7 +913,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = Gender.Female,
@@ -960,7 +960,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie@tamu.edu",
-                    HashedPassword = BC.HashPassword("veryStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("veryStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                     Gender = Gender.Female,
@@ -984,7 +984,7 @@ namespace AggieRent.Tests.Services
                 "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number",
                 ae.Message
             );
-            Assert.True(BC.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("veryStr0ngP@ssw0rd", applicants[0].HashedPassword));
             mockApplicantRepository.Verify((x) => x.Get(It.IsAny<string>()), Times.Once);
             mockApplicantRepository.Verify((x) => x.Update(It.IsAny<Applicant>()), Times.Never);
         }
@@ -1002,7 +1002,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie1@tamu.edu",
-                    HashedPassword = BC.HashPassword("verySt0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("verySt0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },
@@ -1010,7 +1010,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie2@tamu.edu",
-                    HashedPassword = BC.HashPassword("superStr0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("superStr0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Deer",
                 },
@@ -1038,7 +1038,7 @@ namespace AggieRent.Tests.Services
             Assert.Single(applicants);
             Assert.Equal(applicant2Id, applicants[0].Id);
             Assert.Equal("aggie2@tamu.edu", applicants[0].Email);
-            Assert.True(BC.Verify("superStr0ngP@ssw0rd", applicants[0].HashedPassword));
+            Assert.True(AuthUtils.Verify("superStr0ngP@ssw0rd", applicants[0].HashedPassword));
             Assert.Equal("John", applicants[0].FirstName);
             Assert.Equal("Deer", applicants[0].LastName);
             Assert.Equal(Gender.NotSet, applicants[0].Gender);
@@ -1062,7 +1062,7 @@ namespace AggieRent.Tests.Services
                 {
                     Id = Guid.NewGuid().ToString(),
                     Email = "aggie1@tamu.edu",
-                    HashedPassword = BC.HashPassword("verySt0ngP@ssw0rd"),
+                    HashedPassword = AuthUtils.HashPassword("verySt0ngP@ssw0rd"),
                     FirstName = "John",
                     LastName = "Doe",
                 },

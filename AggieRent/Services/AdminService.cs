@@ -27,7 +27,7 @@ namespace AggieRent.Services
                 {
                     Id = id,
                     Email = normalizedEmail,
-                    HashedPassword = BC.HashPassword(password),
+                    HashedPassword = AuthUtils.HashPassword(password),
                 }
             );
             return id;
@@ -60,7 +60,7 @@ namespace AggieRent.Services
                 throw new ArgumentException(
                     "Invalid password! Password must be at least 8 symbols long, with at least 1 lower case character, 1 upper case character, 1 symbol and 1 number"
                 );
-            admin.HashedPassword = BC.HashPassword(password);
+            admin.HashedPassword = AuthUtils.HashPassword(password);
             _adminRepository.Update(admin);
         }
 
