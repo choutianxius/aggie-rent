@@ -2,6 +2,7 @@ using System.Net.Mail;
 using System.Text.RegularExpressions;
 using AggieRent.DataAccess;
 using AggieRent.Models;
+using Isopoh.Cryptography.Argon2;
 
 namespace AggieRent.Services
 {
@@ -68,6 +69,17 @@ namespace AggieRent.Services
         public static bool ValidatePassword(string password)
         {
             return passwordRegex.IsMatch(password);
+        }
+
+        public static string HashPassword(string inputKey)
+        {
+            var hashedPassword = Argon2.Hash(inputKey);
+            return hashedPassword;
+        }
+
+        public static bool Verify(string password, string hashedPassword)
+        {
+            return Argon2.Verify(hashedPassword, password);
         }
     }
 }
